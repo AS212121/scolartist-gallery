@@ -15,6 +15,8 @@
     --cream: #f5f0e8;
     --muted: #555555;
     --text: #e8e4dc;
+    --manga: #8b4c8b;
+    --manga-light: #c47fc4;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -50,21 +52,9 @@
     z-index: 100;
   }
 
-  .logo {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.6rem;
-    font-weight: 300;
-    letter-spacing: 0.2em;
-    color: var(--cream);
-  }
+  .logo { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-weight: 300; letter-spacing: 0.2em; color: var(--cream); }
   .logo span { color: var(--gold); font-style: italic; }
-
-  .header-meta {
-    font-size: 0.65rem;
-    letter-spacing: 0.15em;
-    color: var(--muted);
-    text-transform: uppercase;
-  }
+  .header-meta { font-size: 0.65rem; letter-spacing: 0.15em; color: var(--muted); text-transform: uppercase; }
 
   .hero {
     padding: 5rem 4rem 3rem;
@@ -74,63 +64,66 @@
     gap: 2rem;
     align-items: end;
   }
-
-  .hero-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: clamp(3rem, 6vw, 5.5rem);
-    font-weight: 300;
-    line-height: 0.95;
-    color: var(--cream);
-  }
+  .hero-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(3rem, 6vw, 5.5rem); font-weight: 300; line-height: 0.95; color: var(--cream); }
   .hero-title em { color: var(--gold); font-style: italic; }
-
-  .hero-right {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    align-items: flex-end;
-  }
-
-  .week-badge {
-    font-size: 0.6rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--gold);
-    border: 1px solid var(--gold);
-    padding: 0.4rem 1rem;
-  }
-
+  .hero-right { display: flex; flex-direction: column; gap: 1.5rem; align-items: flex-end; }
+  .week-badge { font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); border: 1px solid var(--gold); padding: 0.4rem 1rem; }
   .hero-stats { display: flex; gap: 3rem; }
   .stat { text-align: right; }
-  .stat-num {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 2.5rem;
-    font-weight: 300;
-    color: var(--cream);
-    line-height: 1;
-  }
-  .stat-label {
-    font-size: 0.55rem;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-top: 0.2rem;
+  .stat-num { font-family: 'Cormorant Garamond', serif; font-size: 2.5rem; font-weight: 300; color: var(--cream); line-height: 1; }
+  .stat-label { font-size: 0.55rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-top: 0.2rem; }
+
+  /* FILTRES */
+  .filters-wrap {
+    border-bottom: 1px solid var(--border);
+    background: rgba(10,10,10,0.95);
+    backdrop-filter: blur(12px);
+    position: sticky;
+    top: 73px;
+    z-index: 90;
   }
 
-  .filters {
-    padding: 1.5rem 4rem;
-    border-bottom: 1px solid var(--border);
+  .filters-primary {
+    padding: 1.2rem 4rem;
     display: flex;
     gap: 0.5rem;
     align-items: center;
   }
-  .filter-label {
-    font-size: 0.6rem;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-right: 1rem;
+
+  .filters-secondary {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    overflow: hidden;
+    max-height: 0;
+    padding: 0 4rem;
+    transition: max-height 0.3s ease, padding 0.3s ease, border-color 0.3s;
+    border-top: 1px solid transparent;
   }
+  .filters-secondary.visible {
+    max-height: 70px;
+    padding: 0.8rem 4rem;
+    border-top-color: var(--border);
+  }
+
+  .filters-tertiary {
+    display: flex;
+    gap: 0.4rem;
+    align-items: center;
+    overflow: hidden;
+    max-height: 0;
+    padding: 0 4rem;
+    transition: max-height 0.3s ease, padding 0.3s ease, border-color 0.3s;
+    border-top: 1px solid transparent;
+  }
+  .filters-tertiary.visible {
+    max-height: 60px;
+    padding: 0.6rem 4rem;
+    border-top-color: var(--border);
+  }
+
+  .filter-label { font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-right: 0.8rem; white-space: nowrap; }
+
   .filter-btn {
     font-family: 'DM Mono', monospace;
     font-size: 0.6rem;
@@ -142,9 +135,14 @@
     color: var(--muted);
     cursor: pointer;
     transition: all 0.2s;
+    white-space: nowrap;
   }
-  .filter-btn:hover, .filter-btn.active { border-color: var(--gold); color: var(--gold); }
+  .filter-btn:hover { border-color: var(--gold); color: var(--gold); }
+  .filter-btn.active { border-color: var(--gold); color: var(--gold); background: rgba(201,168,76,0.08); }
+  .filter-btn.manga-btn:hover,
+  .filter-btn.manga-btn.active { border-color: var(--manga-light); color: var(--manga-light); background: rgba(139,76,139,0.08); }
 
+  /* GALLERY */
   .gallery {
     padding: 3rem 4rem;
     display: grid;
@@ -153,228 +151,63 @@
     background: var(--border);
   }
 
-  .loading-state {
-    grid-column: 1 / -1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 6rem 2rem;
-    gap: 1.5rem;
-  }
-  .loading-spinner {
-    width: 40px;
-    height: 40px;
-    border: 1px solid var(--border);
-    border-top-color: var(--gold);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-  }
+  .loading-state { grid-column: 1/-1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 6rem 2rem; gap: 1.5rem; }
+  .loading-spinner { width: 40px; height: 40px; border: 1px solid var(--border); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
-  .loading-text {
-    font-size: 0.6rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
+  .loading-text { font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); }
 
-  .error-state {
-    grid-column: 1 / -1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 6rem 2rem;
-    gap: 1rem;
-  }
+  .error-state { grid-column: 1/-1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 6rem 2rem; gap: 1rem; }
   .error-icon { font-family: 'Cormorant Garamond', serif; font-size: 3rem; color: var(--border); }
-  .error-text {
-    font-size: 0.6rem;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--muted);
-    text-align: center;
-    line-height: 2;
-  }
+  .error-text { font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); text-align: center; line-height: 2; }
+
+  .empty-state { grid-column: 1/-1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 4rem 2rem; gap: 1rem; }
+  .empty-icon { font-family: 'Cormorant Garamond', serif; font-size: 2rem; color: var(--border); }
+  .empty-text { font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); }
 
   /* CARD */
-  .card {
-    background: var(--bg);
-    position: relative;
-    overflow: hidden;
-    cursor: pointer;
-    transition: background 0.3s;
-    animation: fadeInUp 0.5s ease forwards;
-    opacity: 0;
-  }
+  .card { background: var(--bg); position: relative; overflow: hidden; cursor: pointer; transition: background 0.3s; animation: fadeInUp 0.5s ease forwards; opacity: 0; }
   .card:hover { background: var(--surface); }
-
-  .card-image {
-    width: 100%;
-    height: auto;
-    max-height: 600px;
-    object-fit: contain;
-    display: block;
-    background: #111;
-    filter: grayscale(20%) contrast(1.05);
-    transition: filter 0.4s, transform 0.4s;
-  }
+  .card-image { width: 100%; height: auto; max-height: 600px; object-fit: contain; display: block; background: #111; filter: grayscale(20%) contrast(1.05); transition: filter 0.4s, transform 0.4s; }
   .card:hover .card-image { filter: grayscale(0%) contrast(1.1); transform: scale(1.02); }
-
-  .card-image-placeholder {
-    width: 100%;
-    aspect-ratio: 4/3;
-    background: linear-gradient(135deg, #1a1a1a 0%, #222 50%, #1a1a1a 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 4rem;
-    color: var(--border);
-    transition: transform 0.4s;
-    position: relative;
-    overflow: hidden;
-  }
-  .card-image-placeholder::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(45deg, transparent 30%, rgba(201,168,76,0.05) 50%, transparent 70%);
-    transform: translateX(-100%);
-    transition: transform 0.6s;
-  }
+  .card-image-placeholder { width: 100%; aspect-ratio: 4/3; background: linear-gradient(135deg, #1a1a1a 0%, #222 50%, #1a1a1a 100%); display: flex; align-items: center; justify-content: center; font-family: 'Cormorant Garamond', serif; font-size: 4rem; color: var(--border); transition: transform 0.4s; position: relative; overflow: hidden; }
+  .card-image-placeholder::after { content: ''; position: absolute; inset: 0; background: linear-gradient(45deg, transparent 30%, rgba(201,168,76,0.05) 50%, transparent 70%); transform: translateX(-100%); transition: transform 0.6s; }
   .card:hover .card-image-placeholder::after { transform: translateX(100%); }
   .card:hover .card-image-placeholder { transform: scale(1.02); }
 
-  .rank-badge {
-    position: absolute;
-    top: 1rem;
-    left: 1rem;
-    width: 2.2rem;
-    height: 2.2rem;
-    background: var(--gold);
-    color: var(--bg);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1rem;
-    font-weight: 600;
-    z-index: 2;
-  }
+  .rank-badge { position: absolute; top: 1rem; left: 1rem; width: 2.2rem; height: 2.2rem; background: var(--gold); color: var(--bg); display: flex; align-items: center; justify-content: center; font-family: 'Cormorant Garamond', serif; font-size: 1rem; font-weight: 600; z-index: 2; }
   .rank-badge.gold { background: var(--gold); }
   .rank-badge.silver { background: #9e9e9e; }
   .rank-badge.bronze { background: #a0622a; }
   .rank-badge.normal { background: var(--surface); color: var(--muted); border: 1px solid var(--border); font-size: 0.7rem; font-family: 'DM Mono', monospace; }
 
-  .score-overlay {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    background: rgba(10,10,10,0.85);
-    border: 1px solid var(--gold);
-    padding: 0.3rem 0.6rem;
-    z-index: 2;
-    backdrop-filter: blur(4px);
-  }
-  .score-num {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: var(--gold-light);
-    line-height: 1;
-  }
+  .manga-badge { position: absolute; top: 1rem; right: 1rem; padding: 0.2rem 0.5rem; font-size: 0.45rem; letter-spacing: 0.1em; text-transform: uppercase; background: rgba(139,76,139,0.85); color: var(--manga-light); border: 1px solid var(--manga); z-index: 2; backdrop-filter: blur(4px); }
+
+  .score-overlay { position: absolute; bottom: 0; right: 0; background: rgba(10,10,10,0.85); border-top: 1px solid var(--gold); border-left: 1px solid var(--gold); padding: 0.3rem 0.6rem; z-index: 2; backdrop-filter: blur(4px); }
+  .score-num { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; font-weight: 600; color: var(--gold-light); line-height: 1; }
   .score-label { font-size: 0.45rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
 
   .card-body { padding: 1.2rem 1.5rem 1.5rem; border-top: 1px solid var(--border); }
+  .card-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem; }
+  .artist-name { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; font-weight: 600; color: var(--cream); letter-spacing: 0.05em; }
+  .challenge-day { font-size: 0.55rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gold); border: 1px solid rgba(201,168,76,0.3); padding: 0.2rem 0.5rem; }
 
-  .card-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem; }
+  .card-tags { display: flex; gap: 0.4rem; margin-bottom: 0.6rem; flex-wrap: wrap; }
+  .tag { font-size: 0.5rem; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.15rem 0.5rem; border: 1px solid var(--border); color: var(--muted); }
+  .tag.niveau { border-color: rgba(201,168,76,0.3); color: var(--gold); }
+  .tag.age { border-color: rgba(255,255,255,0.1); color: rgba(247,244,239,0.4); }
+  .tag.manga-tag { border-color: rgba(139,76,139,0.4); color: var(--manga-light); }
 
-  .artist-name {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--cream);
-    letter-spacing: 0.05em;
-  }
-  .challenge-day {
-    font-size: 0.55rem;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--gold);
-    border: 1px solid rgba(201,168,76,0.3);
-    padding: 0.2rem 0.5rem;
-  }
-  .card-theme {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 0.95rem;
-    font-style: italic;
-    color: var(--muted);
-    margin-bottom: 0.8rem;
-    line-height: 1.3;
-  }
-  .card-skill {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    font-size: 0.55rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--gold);
-    margin-bottom: 1rem;
-  }
-  .card-skill::before { content: '✦'; font-size: 0.5rem; }
+  .card-theme { font-family: 'Cormorant Garamond', serif; font-size: 0.9rem; font-style: italic; color: var(--muted); margin-bottom: 0.8rem; line-height: 1.3; }
 
-  .vote-section {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding-top: 0.8rem;
-    border-top: 1px solid var(--border);
-  }
-  .vote-btn {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-family: 'DM Mono', monospace;
-    font-size: 0.6rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    padding: 0.5rem 1rem;
-    border: 1px solid var(--border);
-    background: transparent;
-    color: var(--muted);
-    cursor: pointer;
-    transition: all 0.2s;
-  }
+  .vote-section { display: flex; align-items: center; justify-content: space-between; padding-top: 0.8rem; border-top: 1px solid var(--border); }
+  .vote-btn { display: flex; align-items: center; gap: 0.5rem; font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.5rem 1rem; border: 1px solid var(--border); background: transparent; color: var(--muted); cursor: pointer; transition: all 0.2s; }
   .vote-btn:hover { border-color: var(--gold); color: var(--gold); }
   .vote-btn.voted { border-color: var(--gold); color: var(--gold); background: rgba(201,168,76,0.08); }
   .vote-btn.loading { opacity: 0.5; pointer-events: none; }
   .vote-btn svg { width: 12px; height: 12px; transition: transform 0.2s; }
   .vote-btn:hover svg, .vote-btn.voted svg { transform: scale(1.2); }
-
   .vote-count { font-size: 0.6rem; color: var(--muted); letter-spacing: 0.1em; }
-
-  .score-hybrid {
-    font-size: 0.5rem;
-    color: var(--gold);
-    letter-spacing: 0.08em;
-    opacity: 0.7;
-    margin-top: 2px;
-  }
-
-  .share-btn {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.6rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    padding: 0.5rem 1rem;
-    border: 1px solid var(--border);
-    background: transparent;
-    color: var(--muted);
-    cursor: pointer;
-    transition: all 0.2s;
-  }
+  .share-btn { font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.5rem 1rem; border: 1px solid var(--border); background: transparent; color: var(--muted); cursor: pointer; transition: all 0.2s; }
   .share-btn:hover { border-color: var(--cream); color: var(--cream); }
 
   .card.top1 { grid-column: span 2; }
@@ -382,173 +215,49 @@
   .card.top1 .card-image-placeholder { aspect-ratio: 16/7; font-size: 8rem; }
   .card.top1 .card-body { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; align-items: start; }
   .card.top1 .card-critique { display: block; }
+  .card-critique { display: none; font-size: 0.7rem; line-height: 1.6; color: var(--muted); border-left: 2px solid var(--gold); padding-left: 1rem; font-style: italic; margin-top: 0.5rem; }
 
-  .card-critique {
-    display: none;
-    font-size: 0.7rem;
-    line-height: 1.6;
-    color: var(--muted);
-    border-left: 2px solid var(--gold);
-    padding-left: 1rem;
-    font-style: italic;
-    margin-top: 0.5rem;
-  }
+  /* MODAL */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(10,10,10,0.92); backdrop-filter: blur(8px); z-index: 900; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.25s; }
+  .modal-overlay.open { opacity: 1; pointer-events: all; }
+  .modal { background: var(--surface); border: 1px solid var(--gold); padding: 2.5rem; max-width: 420px; width: 90%; position: relative; animation: fadeInUp 0.25s ease; }
+  .modal-eyebrow { font-size: 0.55rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold); margin-bottom: 1rem; }
+  .modal-title { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-weight: 300; color: var(--cream); margin-bottom: 0.4rem; line-height: 1.2; }
+  .modal-title em { font-style: italic; color: var(--gold); }
+  .modal-sub { font-size: 0.6rem; color: var(--muted); letter-spacing: 0.08em; margin-bottom: 1.8rem; line-height: 1.7; }
+  .modal-field { margin-bottom: 1rem; }
+  .modal-label { display: block; font-size: 0.55rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.4rem; }
+  .modal-label span { color: var(--gold); margin-left: 0.3rem; font-size: 0.5rem; }
+  .modal-input { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--cream); font-family: 'DM Mono', monospace; font-size: 0.75rem; padding: 0.7rem 1rem; outline: none; transition: border-color 0.2s; }
+  .modal-input:focus { border-color: var(--gold); }
+  .modal-input::placeholder { color: var(--muted); }
+  .modal-actions { display: flex; gap: 0.8rem; margin-top: 1.8rem; }
+  .modal-submit { flex: 1; padding: 0.8rem 1.5rem; background: var(--gold); color: var(--bg); border: none; font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; cursor: pointer; transition: opacity 0.2s; }
+  .modal-submit:hover { opacity: 0.85; }
+  .modal-cancel { padding: 0.8rem 1.2rem; background: transparent; color: var(--muted); border: 1px solid var(--border); font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
+  .modal-cancel:hover { border-color: var(--muted); color: var(--cream); }
+  .modal-close { position: absolute; top: 1rem; right: 1rem; background: none; border: none; color: var(--muted); font-size: 1.2rem; cursor: pointer; line-height: 1; }
+  .modal-close:hover { color: var(--cream); }
 
-  footer {
-    border-top: 1px solid var(--border);
-    padding: 2rem 4rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
+  footer { border-top: 1px solid var(--border); padding: 2rem 4rem; display: flex; justify-content: space-between; align-items: center; }
   .footer-logo { font-family: 'Cormorant Garamond', serif; font-size: 1rem; font-weight: 300; letter-spacing: 0.2em; color: var(--muted); }
   .footer-logo span { color: var(--gold); font-style: italic; }
   .footer-meta { font-size: 0.55rem; letter-spacing: 0.1em; color: var(--muted); text-align: right; line-height: 1.8; }
 
-  .toast {
-    position: fixed;
-    bottom: 2rem;
-    left: 50%;
-    transform: translateX(-50%) translateY(100px);
-    background: var(--surface);
-    border: 1px solid var(--gold);
-    padding: 0.8rem 2rem;
-    font-size: 0.65rem;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--gold);
-    transition: transform 0.3s;
-    z-index: 500;
-  }
+  .toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--surface); border: 1px solid var(--gold); padding: 0.8rem 2rem; font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gold); transition: transform 0.3s; z-index: 500; }
   .toast.show { transform: translateX(-50%) translateY(0); }
 
-  /* ── MODAL VOTE ── */
-  .modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(10,10,10,0.92);
-    backdrop-filter: blur(8px);
-    z-index: 900;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.25s;
-  }
-  .modal-overlay.open {
-    opacity: 1;
-    pointer-events: all;
-  }
-  .modal {
-    background: var(--surface);
-    border: 1px solid var(--gold);
-    padding: 2.5rem;
-    max-width: 420px;
-    width: 90%;
-    position: relative;
-    animation: fadeInUp 0.25s ease;
-  }
-  .modal-eyebrow {
-    font-size: 0.55rem;
-    letter-spacing: 0.25em;
-    text-transform: uppercase;
-    color: var(--gold);
-    margin-bottom: 1rem;
-  }
-  .modal-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.6rem;
-    font-weight: 300;
-    color: var(--cream);
-    margin-bottom: 0.4rem;
-    line-height: 1.2;
-  }
-  .modal-title em { font-style: italic; color: var(--gold); }
-  .modal-sub {
-    font-size: 0.6rem;
-    color: var(--muted);
-    letter-spacing: 0.08em;
-    margin-bottom: 1.8rem;
-    line-height: 1.7;
-  }
-  .modal-field { margin-bottom: 1rem; }
-  .modal-label {
-    display: block;
-    font-size: 0.55rem;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 0.4rem;
-  }
-  .modal-label span { color: var(--gold); margin-left: 0.3rem; font-size: 0.5rem; }
-  .modal-input {
-    width: 100%;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    color: var(--cream);
-    font-family: 'DM Mono', monospace;
-    font-size: 0.75rem;
-    padding: 0.7rem 1rem;
-    outline: none;
-    transition: border-color 0.2s;
-  }
-  .modal-input:focus { border-color: var(--gold); }
-  .modal-input::placeholder { color: var(--muted); }
-  .modal-actions { display: flex; gap: 0.8rem; margin-top: 1.8rem; }
-  .modal-submit {
-    flex: 1;
-    padding: 0.8rem 1.5rem;
-    background: var(--gold);
-    color: var(--bg);
-    border: none;
-    font-family: 'DM Mono', monospace;
-    font-size: 0.65rem;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: opacity 0.2s;
-  }
-  .modal-submit:hover { opacity: 0.85; }
-  .modal-cancel {
-    padding: 0.8rem 1.2rem;
-    background: transparent;
-    color: var(--muted);
-    border: 1px solid var(--border);
-    font-family: 'DM Mono', monospace;
-    font-size: 0.65rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  .modal-cancel:hover { border-color: var(--muted); color: var(--cream); }
-  .modal-close {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    background: none;
-    border: none;
-    color: var(--muted);
-    font-size: 1.2rem;
-    cursor: pointer;
-    line-height: 1;
-  }
-  .modal-close:hover { color: var(--cream); }
-
-  @keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
+  @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
   @media (max-width: 768px) {
-    header, .hero, .filters, .gallery, footer { padding-left: 1.5rem; padding-right: 1.5rem; }
+    header, .hero, .filters-primary, .filters-secondary, .filters-tertiary, .gallery, footer { padding-left: 1.5rem; padding-right: 1.5rem; }
     .hero { grid-template-columns: 1fr; }
     .hero-right { align-items: flex-start; }
     .hero-stats { justify-content: flex-start; }
     .card.top1 { grid-column: span 1; }
     .card.top1 .card-body { grid-template-columns: 1fr; }
     .gallery { grid-template-columns: 1fr; }
+    .filters-primary, .filters-secondary, .filters-tertiary { flex-wrap: wrap; gap: 0.4rem; }
   }
 </style>
 </head>
@@ -556,131 +265,115 @@
 
 <header>
   <div class="logo">Scol<span>artist</span></div>
-  <div class="header-meta" id="header-meta">Day Drawing Challenge · Galerie publique · Chargement…</div>
+  <div class="header-meta" id="header-meta">Day Drawing Challenge · Galerie publique · Chargement...</div>
 </header>
 
 <section class="hero">
-  <div>
-    <h1 class="hero-title">Top 10<br><em>de la semaine</em></h1>
-  </div>
+  <div><h1 class="hero-title">Top 10<br><em>de la semaine</em></h1></div>
   <div class="hero-right">
-    <div class="week-badge" id="week-badge">Chargement…</div>
+    <div class="week-badge" id="week-badge">Chargement...</div>
     <div class="hero-stats">
-      <div class="stat">
-        <div class="stat-num" id="stat-soumissions">—</div>
-        <div class="stat-label">Dessins soumis</div>
-      </div>
-      <div class="stat">
-        <div class="stat-num" id="stat-selectionnes">—</div>
-        <div class="stat-label">Sélectionnés</div>
-      </div>
-      <div class="stat">
-        <div class="stat-num" id="stat-votes">—</div>
-        <div class="stat-label">Votes publics</div>
-      </div>
+      <div class="stat"><div class="stat-num" id="stat-soumissions">-</div><div class="stat-label">Dessins soumis</div></div>
+      <div class="stat"><div class="stat-num" id="stat-selectionnes">-</div><div class="stat-label">Selectionnes</div></div>
+      <div class="stat"><div class="stat-num" id="stat-votes">-</div><div class="stat-label">Votes publics</div></div>
     </div>
   </div>
 </section>
 
-<div class="filters">
-  <span class="filter-label">Filtrer :</span>
-  <button class="filter-btn active" onclick="filterCards('all', this)">Tous</button>
-  <button class="filter-btn" onclick="filterCards('Débutant', this)">Débutant</button>
-  <button class="filter-btn" onclick="filterCards('Étudiant', this)">Étudiant</button>
-  <button class="filter-btn" onclick="filterCards('Pro', this)">Pro</button>
+<div class="filters-wrap">
+  <div class="filters-primary" id="filters-primary">
+    <span class="filter-label">Categorie :</span>
+    <button class="filter-btn active" onclick="filterPrimary('all', this)">Tous</button>
+    <button class="filter-btn" onclick="filterPrimary('debutant', this)">Debutants</button>
+    <button class="filter-btn" onclick="filterPrimary('pro', this)">Pro</button>
+    <button class="filter-btn manga-btn" onclick="filterPrimary('manga', this)">Manga</button>
+  </div>
+  <div class="filters-secondary" id="filters-secondary">
+    <span class="filter-label">Groupe :</span>
+    <button class="filter-btn active" onclick="filterSecondary('all', this)">Tous ages</button>
+    <button class="filter-btn" onclick="filterSecondary('enfants', this)">Enfants</button>
+    <button class="filter-btn" onclick="filterSecondary('ados', this)">Ados</button>
+    <button class="filter-btn" onclick="filterSecondary('adultes', this)">Adultes</button>
+  </div>
+  <div class="filters-tertiary" id="filters-tertiary"></div>
 </div>
 
 <main class="gallery" id="gallery">
   <div class="loading-state">
     <div class="loading-spinner"></div>
-    <div class="loading-text">Chargement de la galerie…</div>
+    <div class="loading-text">Chargement de la galerie...</div>
   </div>
 </main>
 
 <footer>
   <div class="footer-logo">Scol<span>artist</span></div>
-  <div class="footer-meta">
-    Day Drawing Challenge · chaque jour à 8h<br>
-    École & Ateliers Schlum · Le Mans
-  </div>
+  <div class="footer-meta">Day Drawing Challenge · chaque jour a 8h<br>Ecole et Ateliers Schlum · Le Mans</div>
 </footer>
 
 <div class="toast" id="toast"></div>
 
-<!-- ── MODAL VOTE ── -->
 <div class="modal-overlay" id="modal-overlay">
   <div class="modal">
-    <button class="modal-close" onclick="closeModal()">✕</button>
-    <div class="modal-eyebrow">✦ Vote public · Scolartist</div>
+    <button class="modal-close" onclick="closeModal()">X</button>
+    <div class="modal-eyebrow">Vote public · Scolartist</div>
     <div class="modal-title">Voter pour<br><em id="modal-artist-name">cet artiste</em></div>
-    <div class="modal-sub">
-      Ton email sert uniquement à éviter les votes multiples.<br>
-      Il ne sera jamais affiché ni partagé.
+    <div class="modal-sub">Ton email sert uniquement a eviter les votes multiples. Il ne sera jamais affiche ni partage.</div>
+    <div class="modal-field">
+      <label class="modal-label">Email <span>- obligatoire</span></label>
+      <input class="modal-input" type="email" id="modal-email" placeholder="ton@email.com" autocomplete="email">
     </div>
     <div class="modal-field">
-      <label class="modal-label">Email <span>— obligatoire</span></label>
-      <input class="modal-input" type="email" id="modal-email"
-             placeholder="ton@email.com" autocomplete="email">
-    </div>
-    <div class="modal-field">
-      <label class="modal-label">Pseudo <span>— optionnel</span></label>
-      <input class="modal-input" type="text" id="modal-pseudo"
-             placeholder="Un artiste de Paris…" maxlength="40">
+      <label class="modal-label">Pseudo <span>- optionnel</span></label>
+      <input class="modal-input" type="text" id="modal-pseudo" placeholder="Un artiste de Paris..." maxlength="40">
     </div>
     <div class="modal-actions">
-      <button class="modal-submit" onclick="submitVote()">✦ Confirmer mon vote</button>
+      <button class="modal-submit" onclick="submitVote()">Confirmer mon vote</button>
       <button class="modal-cancel" onclick="closeModal()">Annuler</button>
     </div>
   </div>
 </div>
 
 <script>
-  // ═══════════════════════════════════════════
-  // CONFIGURATION
-  // ═══════════════════════════════════════════
   const GALLERY_JSON_URL = 'https://schlum.app.n8n.cloud/webhook/gallery-data';
   const VOTE_URL         = 'https://schlum.app.n8n.cloud/webhook/vote';
-  const MAX_VOTES_REF    = 50; // pour calibrer le logarithme
+  const MAX_VOTES_REF    = 50;
 
-  // ═══════════════════════════════════════════
-  // SCORE HYBRIDE : IA 80% + votes 20%
-  // ═══════════════════════════════════════════
-  function scoreHybrid(scoreIA, nbVotes) {
-    const scoreIAPart   = scoreIA * 0.8;
-    const scoreVotePart = (Math.log(nbVotes + 1) / Math.log(MAX_VOTES_REF + 1)) * 20;
-    return Math.min(100, Math.round((scoreIAPart + scoreVotePart) * 10) / 10);
+  const AGE_GROUPS = {
+    enfants: ['3-5 ans', '6-8 ans', '9-12 ans'],
+    ados:    ['13-16 ans', '17-19 ans'],
+    adultes: ['Adulte', '19-99 ans']
+  };
+
+  function getNiveauCategory(niveau) {
+    const n = (niveau || '').toLowerCase();
+    if (n.includes('avance') || n.includes('avanc') || n.includes('expert')) return 'pro';
+    return 'debutant'; // Debutant + Intermediaire = Debutants
   }
 
-  // ═══════════════════════════════════════════
-  // ÉTAT LOCAL
-  // ═══════════════════════════════════════════
-  let allArtworks   = [];
-  let pendingVote   = null; // { id_participation, rang, btn, countEl, scoreEl, scoreIA }
+  function isManga(discipline) {
+    return (discipline || '').toLowerCase().includes('manga');
+  }
 
-  // localStorage : email + votes déjà castés
+  function scoreHybrid(scoreIA, nbVotes) {
+    const ia   = scoreIA * 0.8;
+    const vote = (Math.log(nbVotes + 1) / Math.log(MAX_VOTES_REF + 1)) * 20;
+    return Math.min(100, Math.round((ia + vote) * 10) / 10);
+  }
+
+  let allArtworks = [];
+  let activeFilters = { primary: 'all', secondary: 'all', tertiary: 'all' };
+  let pendingVote = null;
+
   const LS_EMAIL  = 'scolartist_email';
   const LS_PSEUDO = 'scolartist_pseudo';
-  const LS_VOTED  = 'scolartist_voted'; // JSON array d'id_participation
+  const LS_VOTED  = 'scolartist_voted';
 
-  function getVotedList() {
-    try { return JSON.parse(localStorage.getItem(LS_VOTED) || '[]'); }
-    catch { return []; }
-  }
-  function saveVoted(list) {
-    localStorage.setItem(LS_VOTED, JSON.stringify(list));
-  }
+  function getVotedList() { try { return JSON.parse(localStorage.getItem(LS_VOTED) || '[]'); } catch { return []; } }
+  function saveVoted(l) { localStorage.setItem(LS_VOTED, JSON.stringify(l)); }
   function hasVoted(id) { return getVotedList().includes(id); }
-  function addVoted(id) {
-    const list = getVotedList();
-    if (!list.includes(id)) { list.push(id); saveVoted(list); }
-  }
-  function removeVoted(id) {
-    saveVoted(getVotedList().filter(v => v !== id));
-  }
+  function addVoted(id) { const l = getVotedList(); if (!l.includes(id)) { l.push(id); saveVoted(l); } }
+  function removeVoted(id) { saveVoted(getVotedList().filter(v => v !== id)); }
 
-  // ═══════════════════════════════════════════
-  // CHARGEMENT GALERIE
-  // ═══════════════════════════════════════════
   async function loadGallery() {
     try {
       const res = await fetch(GALLERY_JSON_URL);
@@ -688,121 +381,178 @@
       const data = await res.json();
       renderGallery(data);
     } catch (err) {
-      console.error('Erreur chargement galerie:', err);
-      document.getElementById('gallery').innerHTML = `
-        <div class="error-state">
-          <div class="error-icon">✦</div>
-          <div class="error-text">
-            Impossible de charger la galerie<br>
-            <span style="color:var(--border)">${err.message}</span>
-          </div>
-        </div>`;
+      document.getElementById('gallery').innerHTML =
+        '<div class="error-state"><div class="error-icon">+</div><div class="error-text">Impossible de charger la galerie<br>' + err.message + '</div></div>';
     }
   }
 
   function renderGallery(data) {
     allArtworks = data.artworks || [];
-    document.getElementById('header-meta').textContent =
-      `Day Drawing Challenge · Galerie publique · Semaine ${data.numero_semaine}`;
+    document.getElementById('header-meta').textContent = 'Day Drawing Challenge · Galerie publique · Semaine ' + data.numero_semaine;
     document.getElementById('week-badge').textContent = data.semaine;
     document.getElementById('stat-soumissions').textContent = data.total_soumissions;
     document.getElementById('stat-selectionnes').textContent = allArtworks.length;
     document.getElementById('stat-votes').textContent = data.total_votes || 0;
-    renderCards(allArtworks);
+    applyFilters();
+  }
+
+  // Groupes d'age disponibles par categorie principale
+  const AGE_BY_CATEGORY = {
+    debutant: ['enfants', 'ados', 'adultes'],
+    pro:      ['enfants', 'ados', 'adultes'],
+    manga:    ['enfants', 'ados', 'adultes']
+  };
+
+  const AGE_LABELS = {
+    enfants: 'Enfants',
+    ados:    'Ados',
+    adultes: 'Adultes'
+  };
+
+  function filterPrimary(value, btn) {
+    activeFilters.primary = value;
+    activeFilters.secondary = 'all';
+    activeFilters.tertiary = 'all';
+    document.querySelectorAll('.filters-primary .filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    const sec = document.getElementById('filters-secondary');
+    const ter = document.getElementById('filters-tertiary');
+    ter.classList.remove('visible');
+
+    if (value !== 'all' && AGE_BY_CATEGORY[value]) {
+      const groups = AGE_BY_CATEGORY[value];
+      sec.innerHTML = '<span class="filter-label">Groupe :</span>' +
+        '<button class="filter-btn active" onclick="filterSecondary(\'all\', this)">Tous ages</button>' +
+        groups.map(g => '<button class="filter-btn" onclick="filterSecondary(\'' + g + '\', this)">' + AGE_LABELS[g] + '</button>').join('');
+      sec.classList.add('visible');
+    } else {
+      sec.classList.remove('visible');
+    }
+    applyFilters();
+  }
+
+  function filterSecondary(value, btn) {
+    activeFilters.secondary = value;
+    activeFilters.tertiary = 'all';
+    document.querySelectorAll('.filters-secondary .filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    const ter = document.getElementById('filters-tertiary');
+    const ages = AGE_GROUPS[value];
+
+    if (value !== 'all' && value !== 'adultes' && ages && ages.length > 0) {
+      ter.innerHTML = '<span class="filter-label">Age :</span>' +
+        '<button class="filter-btn active" onclick="filterTertiary(\'all\', this)">Tous</button>' +
+        ages.map(a => '<button class="filter-btn" onclick="filterTertiary(\'' + a + '\', this)">' + a + '</button>').join('');
+      ter.classList.add('visible');
+    } else {
+      ter.classList.remove('visible');
+    }
+    applyFilters();
+  }
+
+  function filterTertiary(value, btn) {
+    activeFilters.tertiary = value;
+    document.querySelectorAll('.filters-tertiary .filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    applyFilters();
+  }
+
+  function applyFilters() {
+    let f = allArtworks;
+    const { primary, secondary, tertiary } = activeFilters;
+
+    if (primary === 'manga') {
+      f = f.filter(a => isManga(a.discipline));
+    } else if (primary !== 'all') {
+      f = f.filter(a => getNiveauCategory(a.niveau) === primary);
+    }
+
+    if (secondary !== 'all' && AGE_GROUPS[secondary]) {
+      f = f.filter(a => AGE_GROUPS[secondary].includes(a.age));
+    }
+
+    if (tertiary !== 'all') {
+      f = f.filter(a => a.age === tertiary);
+    }
+
+    renderCards(f);
   }
 
   function renderCards(artworks) {
-    const gallery   = document.getElementById('gallery');
+    const gallery = document.getElementById('gallery');
     const votedList = getVotedList();
-    const svgHeart  = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>`;
+    const svgHeart = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>';
 
-    gallery.innerHTML = artworks.map((a, idx) => {
-      const isTop1     = a.rang === 1 && artworks === allArtworks;
-      const rankClass  = a.rang === 1 ? 'gold' : a.rang === 2 ? 'silver' : a.rang === 3 ? 'bronze' : 'normal';
-      const rankLabel  = a.rang <= 3 ? a.rang : `#${a.rang}`;
-      const delay      = `animation-delay: ${idx * 0.1 + 0.1}s`;
-      const id         = a.id_participation || String(a.rang);
-      const isVoted    = votedList.includes(id);
-      const nbVotes    = a.votes || 0;
-      const hybrid     = scoreHybrid(a.score, nbVotes);
-
-      const imageHtml = a.url_image
-        ? `<img class="card-image" src="${a.url_image}" alt="Œuvre de ${a.prenom}" loading="lazy"
-               onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
-        : '';
-      const placeholderHtml = `<div class="card-image-placeholder" style="${a.url_image ? 'display:none' : ''}">🎨</div>`;
-      const critiqueHtml = a.critique
-        ? `<div class="card-critique">« ${a.critique} »</div>` : '';
-
-      return `
-        <article class="card${isTop1 ? ' top1' : ''}" data-niveau="${a.niveau}" style="${delay}">
-          ${imageHtml}
-          ${placeholderHtml}
-          <div class="rank-badge ${rankClass}">${rankLabel}</div>
-          <div class="score-overlay">
-            <div class="score-num" id="score-hybrid-${id}">${hybrid}</div>
-            <div class="score-label">Score</div>
-          </div>
-          <div class="card-body">
-            <div>
-              <div class="card-meta">
-                <span class="artist-name">${a.prenom}</span>
-                <span class="challenge-day">J · ${a.challenge_id}</span>
-              </div>
-              <div class="card-theme">${a.titre}</div>
-              <div><span class="card-skill">${a.niveau}</span></div>
-              <div class="vote-section">
-                <button class="vote-btn${isVoted ? ' voted' : ''}"
-                        onclick="vote(this, '${id}', '${a.prenom}', ${a.score})"
-                        data-id="${id}">
-                  ${svgHeart} ${isVoted ? 'Voté' : 'Voter'}
-                </button>
-                <span class="vote-count" id="votes-${id}">${nbVotes} vote${nbVotes !== 1 ? 's' : ''}</span>
-                <button class="share-btn" onclick="share('${a.prenom}', ${a.challenge_id})">Partager →</button>
-              </div>
-            </div>
-            ${isTop1 ? critiqueHtml : ''}
-          </div>
-        </article>`;
-    }).join('');
-  }
-
-  // ═══════════════════════════════════════════
-  // VOTE — clic sur le bouton
-  // ═══════════════════════════════════════════
-  function vote(btn, id, prenom, scoreIA) {
-    const countEl  = document.getElementById('votes-' + id);
-    const scoreEl  = document.getElementById('score-hybrid-' + id);
-    const isVoted  = hasVoted(id);
-
-    if (isVoted) {
-      // Retrait du vote — direct, pas de modal
-      submitVoteDirect({ id, action: 'remove', btn, countEl, scoreEl, scoreIA });
+    if (artworks.length === 0) {
+      gallery.innerHTML = '<div class="empty-state"><div class="empty-icon">+</div><div class="empty-text">Aucune oeuvre dans cette categorie</div></div>';
       return;
     }
 
-    // Nouveau vote — email déjà connu ?
+    gallery.innerHTML = artworks.map((a, idx) => {
+      const isTop1    = a.rang === 1 && activeFilters.primary === 'all' && activeFilters.secondary === 'all';
+      const rankClass = a.rang === 1 ? 'gold' : a.rang === 2 ? 'silver' : a.rang === 3 ? 'bronze' : 'normal';
+      const rankLabel = a.rang <= 3 ? a.rang : '#' + a.rang;
+      const delay     = 'animation-delay: ' + (idx * 0.08 + 0.1) + 's';
+      const id        = a.id_participation || String(a.rang);
+      const isVoted   = votedList.includes(id);
+      const nbVotes   = a.votes || 0;
+      const hybrid    = scoreHybrid(a.score, nbVotes);
+      const manga     = isManga(a.discipline);
+
+      const imageHtml = a.url_image
+        ? '<img class="card-image" src="' + a.url_image + '" alt="Oeuvre de ' + a.prenom + '" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">'
+        : '';
+      const placeholderHtml = '<div class="card-image-placeholder" style="' + (a.url_image ? 'display:none' : '') + '">&#127912;</div>';
+      const critiqueHtml = a.critique ? '<div class="card-critique">« ' + a.critique + ' »</div>' : '';
+
+      return '<article class="card' + (isTop1 ? ' top1' : '') + '" style="' + delay + '">' +
+        imageHtml + placeholderHtml +
+        '<div class="rank-badge ' + rankClass + '">' + rankLabel + '</div>' +
+        (manga ? '<div class="manga-badge">Manga</div>' : '') +
+        '<div class="score-overlay"><div class="score-num" id="score-hybrid-' + id + '">' + hybrid + '</div><div class="score-label">Score</div></div>' +
+        '<div class="card-body"><div>' +
+        '<div class="card-meta"><span class="artist-name">' + a.prenom + '</span><span class="challenge-day">J · ' + a.challenge_id + '</span></div>' +
+        '<div class="card-tags">' +
+        '<span class="tag niveau">' + (a.niveau || 'gratuit') + '</span>' +
+        (a.age ? '<span class="tag age">' + a.age + '</span>' : '') +
+        (manga ? '<span class="tag manga-tag">Manga</span>' : '') +
+        '</div>' +
+        '<div class="card-theme">' + a.titre + '</div>' +
+        '<div class="vote-section">' +
+        '<button class="vote-btn' + (isVoted ? ' voted' : '') + '" onclick="vote(this, \'' + id + '\', \'' + a.prenom + '\', ' + a.score + ')" data-id="' + id + '">' +
+        svgHeart + ' ' + (isVoted ? 'Vote' : 'Voter') + '</button>' +
+        '<span class="vote-count" id="votes-' + id + '">' + nbVotes + ' vote' + (nbVotes !== 1 ? 's' : '') + '</span>' +
+        '<button class="share-btn" onclick="share(\'' + a.prenom + '\', ' + a.challenge_id + ')">Partager</button>' +
+        '</div></div>' + (isTop1 ? critiqueHtml : '') + '</div></article>';
+    }).join('');
+  }
+
+  function vote(btn, id, prenom, scoreIA) {
+    const countEl = document.getElementById('votes-' + id);
+    const scoreEl = document.getElementById('score-hybrid-' + id);
+    const isVoted = hasVoted(id);
+
+    if (isVoted) {
+      submitVoteDirect({ id, action: 'remove', btn, countEl, scoreEl, scoreIA });
+      return;
+    }
     const savedEmail = localStorage.getItem(LS_EMAIL);
     if (savedEmail) {
-      // Email connu → vote direct sans modal
-      const pseudo = localStorage.getItem(LS_PSEUDO) || '';
-      submitVoteDirect({ id, action: 'add', btn, countEl, scoreEl, scoreIA, email: savedEmail, pseudo });
+      submitVoteDirect({ id, action: 'add', btn, countEl, scoreEl, scoreIA, email: savedEmail, pseudo: localStorage.getItem(LS_PSEUDO) || '' });
     } else {
-      // Email inconnu → ouvrir modal
       pendingVote = { id, action: 'add', btn, countEl, scoreEl, scoreIA };
       openModal(prenom);
     }
   }
 
-  // ═══════════════════════════════════════════
-  // MODAL
-  // ═══════════════════════════════════════════
   function openModal(prenom) {
     document.getElementById('modal-artist-name').textContent = prenom;
     document.getElementById('modal-email').value = localStorage.getItem(LS_EMAIL) || '';
     document.getElementById('modal-pseudo').value = localStorage.getItem(LS_PSEUDO) || '';
     document.getElementById('modal-overlay').classList.add('open');
-    setTimeout(() => document.getElementById('modal-email').focus(), 100);
+    setTimeout(function() { document.getElementById('modal-email').focus(); }, 100);
   }
 
   function closeModal() {
@@ -810,149 +560,72 @@
     pendingVote = null;
   }
 
-  // Fermer en cliquant hors du modal
-  document.getElementById('modal-overlay').addEventListener('click', function(e) {
-    if (e.target === this) closeModal();
-  });
-
-  // Valider avec Entrée
+  document.getElementById('modal-overlay').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') closeModal();
-    if (e.key === 'Enter' && document.getElementById('modal-overlay').classList.contains('open')) {
-      submitVote();
-    }
+    if (e.key === 'Enter' && document.getElementById('modal-overlay').classList.contains('open')) submitVote();
   });
 
   function submitVote() {
     const email  = document.getElementById('modal-email').value.trim().toLowerCase();
     const pseudo = document.getElementById('modal-pseudo').value.trim();
-
-    if (!email || !email.includes('@')) {
-      showToast('Entre un email valide pour voter');
-      document.getElementById('modal-email').focus();
-      return;
-    }
-
-    // Sauvegarder en localStorage
+    if (!email || !email.includes('@')) { showToast('Entre un email valide'); document.getElementById('modal-email').focus(); return; }
     localStorage.setItem(LS_EMAIL, email);
     if (pseudo) localStorage.setItem(LS_PSEUDO, pseudo);
-
     closeModal();
-
-    if (pendingVote) {
-      submitVoteDirect({ ...pendingVote, email, pseudo });
-      pendingVote = null;
-    }
+    if (pendingVote) { submitVoteDirect(Object.assign({}, pendingVote, { email, pseudo })); pendingVote = null; }
   }
 
-  // ═══════════════════════════════════════════
-  // APPEL WEBHOOK n8n
-  // ═══════════════════════════════════════════
-  async function submitVoteDirect({ id, action, btn, countEl, scoreEl, scoreIA, email, pseudo }) {
-    // Mise à jour optimiste de l'UI
+  async function submitVoteDirect(opts) {
+    const { id, action, btn, countEl, scoreEl, scoreIA, email, pseudo } = opts;
     btn.classList.add('loading');
-    const currentVotes = parseInt(countEl.textContent) || 0;
-    const newVotes     = action === 'add' ? currentVotes + 1 : Math.max(0, currentVotes - 1);
+    const cur = parseInt(countEl.textContent) || 0;
+    const nv  = action === 'add' ? cur + 1 : Math.max(0, cur - 1);
 
-    if (action === 'add') {
-      btn.classList.add('voted');
-      btn.innerHTML = btn.innerHTML.replace('Voter', 'Voté');
-      addVoted(id);
-    } else {
-      btn.classList.remove('voted');
-      btn.innerHTML = btn.innerHTML.replace('Voté', 'Voter');
-      removeVoted(id);
-    }
+    if (action === 'add') { btn.classList.add('voted'); btn.innerHTML = btn.innerHTML.replace('Voter', 'Vote'); addVoted(id); }
+    else { btn.classList.remove('voted'); btn.innerHTML = btn.innerHTML.replace('Vote', 'Voter'); removeVoted(id); }
 
-    countEl.textContent = `${newVotes} vote${newVotes !== 1 ? 's' : ''}`;
-    if (scoreEl) scoreEl.textContent = scoreHybrid(scoreIA, newVotes);
+    countEl.textContent = nv + ' vote' + (nv !== 1 ? 's' : '');
+    if (scoreEl) scoreEl.textContent = scoreHybrid(scoreIA, nv);
 
-    // Mise à jour stat header
-    const statVotes = document.getElementById('stat-votes');
-    const totalActuel = parseInt(statVotes.textContent) || 0;
-    statVotes.textContent = action === 'add' ? totalActuel + 1 : Math.max(0, totalActuel - 1);
+    const sv = document.getElementById('stat-votes');
+    sv.textContent = action === 'add' ? (parseInt(sv.textContent) || 0) + 1 : Math.max(0, (parseInt(sv.textContent) || 0) - 1);
 
     try {
       const res = await fetch(VOTE_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          id_participation: id,
-          email:  email || localStorage.getItem(LS_EMAIL) || '',
-          pseudo: pseudo || localStorage.getItem(LS_PSEUDO) || '',
-          action
-        })
+        body: JSON.stringify({ id_participation: id, email: email || localStorage.getItem(LS_EMAIL) || '', pseudo: pseudo || localStorage.getItem(LS_PSEUDO) || '', action })
       });
-
       const data = await res.json();
-
-      if (data.ok) {
-        showToast(action === 'add' ? '✦ Vote enregistré !' : 'Vote retiré');
-      } else {
-        // Rollback si erreur serveur
-        rollbackVote({ action, btn, countEl, scoreEl, scoreIA, currentVotes, id });
-        showToast(data.message || 'Erreur lors du vote');
-      }
-    } catch (err) {
-      // Rollback si réseau KO
-      rollbackVote({ action, btn, countEl, scoreEl, scoreIA, currentVotes, id });
-      showToast('Connexion impossible — réessaie');
-      console.error('Vote error:', err);
-    } finally {
-      btn.classList.remove('loading');
-    }
+      if (data.ok) { showToast(action === 'add' ? 'Vote enregistre !' : 'Vote retire'); }
+      else { rollback(opts, cur); showToast(data.message || 'Erreur vote'); }
+    } catch (e) {
+      rollback(opts, cur);
+      showToast('Connexion impossible');
+    } finally { btn.classList.remove('loading'); }
   }
 
-  function rollbackVote({ action, btn, countEl, scoreEl, scoreIA, currentVotes, id }) {
-    if (action === 'add') {
-      btn.classList.remove('voted');
-      btn.innerHTML = btn.innerHTML.replace('Voté', 'Voter');
-      removeVoted(id);
-    } else {
-      btn.classList.add('voted');
-      btn.innerHTML = btn.innerHTML.replace('Voter', 'Voté');
-      addVoted(id);
-    }
-    countEl.textContent = `${currentVotes} vote${currentVotes !== 1 ? 's' : ''}`;
-    if (scoreEl) scoreEl.textContent = scoreHybrid(scoreIA, currentVotes);
+  function rollback({ action, btn, countEl, scoreEl, scoreIA, id }, cur) {
+    if (action === 'add') { btn.classList.remove('voted'); btn.innerHTML = btn.innerHTML.replace('Vote', 'Voter'); removeVoted(id); }
+    else { btn.classList.add('voted'); btn.innerHTML = btn.innerHTML.replace('Voter', 'Vote'); addVoted(id); }
+    countEl.textContent = cur + ' vote' + (cur !== 1 ? 's' : '');
+    if (scoreEl) scoreEl.textContent = scoreHybrid(scoreIA, cur);
   }
 
-  // ═══════════════════════════════════════════
-  // PARTAGE
-  // ═══════════════════════════════════════════
   function share(artist, day) {
-    const text = `Je vote pour ${artist} — Défi J${day} sur Scolartist ! 🎨`;
-    if (navigator.share) {
-      navigator.share({ title: 'Scolartist Gallery', text, url: window.location.href });
-    } else {
-      navigator.clipboard.writeText(text + ' ' + window.location.href);
-      showToast('Lien copié dans le presse-papier !');
-    }
+    const text = 'Je vote pour ' + artist + ' - Defi J' + day + ' sur Scolartist !';
+    if (navigator.share) { navigator.share({ title: 'Scolartist Gallery', text, url: window.location.href }); }
+    else { navigator.clipboard.writeText(text + ' ' + window.location.href); showToast('Lien copie !'); }
   }
 
-  // ═══════════════════════════════════════════
-  // FILTRE
-  // ═══════════════════════════════════════════
-  function filterCards(niveau, btn) {
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    const filtered = niveau === 'all'
-      ? allArtworks
-      : allArtworks.filter(a => a.niveau === niveau);
-    renderCards(filtered);
-  }
-
-  // ═══════════════════════════════════════════
-  // TOAST
-  // ═══════════════════════════════════════════
   function showToast(msg) {
-    const toast = document.getElementById('toast');
-    toast.textContent = msg;
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 2500);
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(function() { t.classList.remove('show'); }, 2500);
   }
 
-  // Chargement au démarrage
   loadGallery();
 </script>
 </body>
