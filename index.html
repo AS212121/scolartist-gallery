@@ -101,9 +101,7 @@
   }
 
   .hero-stats { display: flex; gap: 3rem; }
-
   .stat { text-align: right; }
-
   .stat-num {
     font-family: 'Cormorant Garamond', serif;
     font-size: 2.5rem;
@@ -111,7 +109,6 @@
     color: var(--cream);
     line-height: 1;
   }
-
   .stat-label {
     font-size: 0.55rem;
     letter-spacing: 0.15em;
@@ -127,7 +124,6 @@
     gap: 0.5rem;
     align-items: center;
   }
-
   .filter-label {
     font-size: 0.6rem;
     letter-spacing: 0.15em;
@@ -135,7 +131,6 @@
     color: var(--muted);
     margin-right: 1rem;
   }
-
   .filter-btn {
     font-family: 'DM Mono', monospace;
     font-size: 0.6rem;
@@ -158,7 +153,6 @@
     background: var(--border);
   }
 
-  /* LOADING STATE */
   .loading-state {
     grid-column: 1 / -1;
     display: flex;
@@ -168,7 +162,6 @@
     padding: 6rem 2rem;
     gap: 1.5rem;
   }
-
   .loading-spinner {
     width: 40px;
     height: 40px;
@@ -177,9 +170,7 @@
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
   }
-
   @keyframes spin { to { transform: rotate(360deg); } }
-
   .loading-text {
     font-size: 0.6rem;
     letter-spacing: 0.2em;
@@ -187,7 +178,6 @@
     color: var(--muted);
   }
 
-  /* ERROR STATE */
   .error-state {
     grid-column: 1 / -1;
     display: flex;
@@ -197,13 +187,7 @@
     padding: 6rem 2rem;
     gap: 1rem;
   }
-
-  .error-icon {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 3rem;
-    color: var(--border);
-  }
-
+  .error-icon { font-family: 'Cormorant Garamond', serif; font-size: 3rem; color: var(--border); }
   .error-text {
     font-size: 0.6rem;
     letter-spacing: 0.15em;
@@ -223,7 +207,6 @@
     animation: fadeInUp 0.5s ease forwards;
     opacity: 0;
   }
-
   .card:hover { background: var(--surface); }
 
   .card-image {
@@ -236,11 +219,7 @@
     filter: grayscale(20%) contrast(1.05);
     transition: filter 0.4s, transform 0.4s;
   }
-
-  .card:hover .card-image {
-    filter: grayscale(0%) contrast(1.1);
-    transform: scale(1.02);
-  }
+  .card:hover .card-image { filter: grayscale(0%) contrast(1.1); transform: scale(1.02); }
 
   .card-image-placeholder {
     width: 100%;
@@ -256,7 +235,6 @@
     position: relative;
     overflow: hidden;
   }
-
   .card-image-placeholder::after {
     content: '';
     position: absolute;
@@ -265,7 +243,6 @@
     transform: translateX(-100%);
     transition: transform 0.6s;
   }
-
   .card:hover .card-image-placeholder::after { transform: translateX(100%); }
   .card:hover .card-image-placeholder { transform: scale(1.02); }
 
@@ -285,7 +262,6 @@
     font-weight: 600;
     z-index: 2;
   }
-
   .rank-badge.gold { background: var(--gold); }
   .rank-badge.silver { background: #9e9e9e; }
   .rank-badge.bronze { background: #a0622a; }
@@ -301,7 +277,6 @@
     z-index: 2;
     backdrop-filter: blur(4px);
   }
-
   .score-num {
     font-family: 'Cormorant Garamond', serif;
     font-size: 1.2rem;
@@ -309,25 +284,11 @@
     color: var(--gold-light);
     line-height: 1;
   }
+  .score-label { font-size: 0.45rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
 
-  .score-label {
-    font-size: 0.45rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
+  .card-body { padding: 1.2rem 1.5rem 1.5rem; border-top: 1px solid var(--border); }
 
-  .card-body {
-    padding: 1.2rem 1.5rem 1.5rem;
-    border-top: 1px solid var(--border);
-  }
-
-  .card-meta {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 0.6rem;
-  }
+  .card-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem; }
 
   .artist-name {
     font-family: 'Cormorant Garamond', serif;
@@ -336,7 +297,6 @@
     color: var(--cream);
     letter-spacing: 0.05em;
   }
-
   .challenge-day {
     font-size: 0.55rem;
     letter-spacing: 0.15em;
@@ -345,7 +305,6 @@
     border: 1px solid rgba(201,168,76,0.3);
     padding: 0.2rem 0.5rem;
   }
-
   .card-theme {
     font-family: 'Cormorant Garamond', serif;
     font-size: 0.95rem;
@@ -354,7 +313,6 @@
     margin-bottom: 0.8rem;
     line-height: 1.3;
   }
-
   .card-skill {
     display: inline-flex;
     align-items: center;
@@ -367,19 +325,6 @@
   }
   .card-skill::before { content: '✦'; font-size: 0.5rem; }
 
-  .card-niveau {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    font-size: 0.5rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-left: 0.8rem;
-    border: 1px solid var(--border);
-    padding: 0.15rem 0.4rem;
-  }
-
   .vote-section {
     display: flex;
     align-items: center;
@@ -387,7 +332,6 @@
     padding-top: 0.8rem;
     border-top: 1px solid var(--border);
   }
-
   .vote-btn {
     display: flex;
     align-items: center;
@@ -403,13 +347,21 @@
     cursor: pointer;
     transition: all 0.2s;
   }
-
   .vote-btn:hover { border-color: var(--gold); color: var(--gold); }
   .vote-btn.voted { border-color: var(--gold); color: var(--gold); background: rgba(201,168,76,0.08); }
+  .vote-btn.loading { opacity: 0.5; pointer-events: none; }
   .vote-btn svg { width: 12px; height: 12px; transition: transform 0.2s; }
   .vote-btn:hover svg, .vote-btn.voted svg { transform: scale(1.2); }
 
   .vote-count { font-size: 0.6rem; color: var(--muted); letter-spacing: 0.1em; }
+
+  .score-hybrid {
+    font-size: 0.5rem;
+    color: var(--gold);
+    letter-spacing: 0.08em;
+    opacity: 0.7;
+    margin-top: 2px;
+  }
 
   .share-btn {
     font-family: 'DM Mono', monospace;
@@ -425,7 +377,6 @@
   }
   .share-btn:hover { border-color: var(--cream); color: var(--cream); }
 
-  /* TOP 1 SPECIAL */
   .card.top1 { grid-column: span 2; }
   .card.top1 .card-image { max-height: 700px; }
   .card.top1 .card-image-placeholder { aspect-ratio: 16/7; font-size: 8rem; }
@@ -450,10 +401,8 @@
     justify-content: space-between;
     align-items: center;
   }
-
   .footer-logo { font-family: 'Cormorant Garamond', serif; font-size: 1rem; font-weight: 300; letter-spacing: 0.2em; color: var(--muted); }
   .footer-logo span { color: var(--gold); font-style: italic; }
-
   .footer-meta { font-size: 0.55rem; letter-spacing: 0.1em; color: var(--muted); text-align: right; line-height: 1.8; }
 
   .toast {
@@ -472,6 +421,120 @@
     z-index: 500;
   }
   .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* ── MODAL VOTE ── */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(10,10,10,0.92);
+    backdrop-filter: blur(8px);
+    z-index: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s;
+  }
+  .modal-overlay.open {
+    opacity: 1;
+    pointer-events: all;
+  }
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--gold);
+    padding: 2.5rem;
+    max-width: 420px;
+    width: 90%;
+    position: relative;
+    animation: fadeInUp 0.25s ease;
+  }
+  .modal-eyebrow {
+    font-size: 0.55rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1rem;
+  }
+  .modal-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.6rem;
+    font-weight: 300;
+    color: var(--cream);
+    margin-bottom: 0.4rem;
+    line-height: 1.2;
+  }
+  .modal-title em { font-style: italic; color: var(--gold); }
+  .modal-sub {
+    font-size: 0.6rem;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    margin-bottom: 1.8rem;
+    line-height: 1.7;
+  }
+  .modal-field { margin-bottom: 1rem; }
+  .modal-label {
+    display: block;
+    font-size: 0.55rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.4rem;
+  }
+  .modal-label span { color: var(--gold); margin-left: 0.3rem; font-size: 0.5rem; }
+  .modal-input {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--cream);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    padding: 0.7rem 1rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .modal-input:focus { border-color: var(--gold); }
+  .modal-input::placeholder { color: var(--muted); }
+  .modal-actions { display: flex; gap: 0.8rem; margin-top: 1.8rem; }
+  .modal-submit {
+    flex: 1;
+    padding: 0.8rem 1.5rem;
+    background: var(--gold);
+    color: var(--bg);
+    border: none;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .modal-submit:hover { opacity: 0.85; }
+  .modal-cancel {
+    padding: 0.8rem 1.2rem;
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .modal-cancel:hover { border-color: var(--muted); color: var(--cream); }
+  .modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 1.2rem;
+    cursor: pointer;
+    line-height: 1;
+  }
+  .modal-close:hover { color: var(--cream); }
 
   @keyframes fadeInUp {
     from { opacity: 0; transform: translateY(20px); }
@@ -498,10 +561,7 @@
 
 <section class="hero">
   <div>
-    <h1 class="hero-title">
-      Top 10<br>
-      <em>de la semaine</em>
-    </h1>
+    <h1 class="hero-title">Top 10<br><em>de la semaine</em></h1>
   </div>
   <div class="hero-right">
     <div class="week-badge" id="week-badge">Chargement…</div>
@@ -547,75 +607,86 @@
 
 <div class="toast" id="toast"></div>
 
+<!-- ── MODAL VOTE ── -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-eyebrow">✦ Vote public · Scolartist</div>
+    <div class="modal-title">Voter pour<br><em id="modal-artist-name">cet artiste</em></div>
+    <div class="modal-sub">
+      Ton email sert uniquement à éviter les votes multiples.<br>
+      Il ne sera jamais affiché ni partagé.
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">Email <span>— obligatoire</span></label>
+      <input class="modal-input" type="email" id="modal-email"
+             placeholder="ton@email.com" autocomplete="email">
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">Pseudo <span>— optionnel</span></label>
+      <input class="modal-input" type="text" id="modal-pseudo"
+             placeholder="Un artiste de Paris…" maxlength="40">
+    </div>
+    <div class="modal-actions">
+      <button class="modal-submit" onclick="submitVote()">✦ Confirmer mon vote</button>
+      <button class="modal-cancel" onclick="closeModal()">Annuler</button>
+    </div>
+  </div>
+</div>
+
 <script>
-  // ═══════════════════════════════════════════════════
-  // CONFIGURATION — remplace par ton URL webhook n8n
-  // ═══════════════════════════════════════════════════
+  // ═══════════════════════════════════════════
+  // CONFIGURATION
+  // ═══════════════════════════════════════════
   const GALLERY_JSON_URL = 'https://schlum.app.n8n.cloud/webhook/gallery-data';
+  const VOTE_URL         = 'https://schlum.app.n8n.cloud/webhook/vote';
+  const MAX_VOTES_REF    = 50; // pour calibrer le logarithme
 
-  // ═══════════════════════════════════════════════════
-  // FORMAT JSON ATTENDU DU WEBHOOK N8N :
-  // {
-  //   "semaine": "Semaine du 3 au 9 mars 2026",
-  //   "numero_semaine": 9,
-  //   "total_soumissions": 47,
-  //   "total_votes": 128,
-  //   "artworks": [
-  //     {
-  //       "rang": 1,
-  //       "prenom": "Camille R.",
-  //       "niveau": "Étudiant",
-  //       "challenge_id": 17,
-  //       "titre": "Portrait expressif",
-  //       "score": 94.2,
-  //       "url_image": "https://...",
-  //       "critique": "Une maîtrise remarquable...",
-  //       "votes": 32
-  //     },
-  //     ...
-  //   ]
-  // }
-  // ═══════════════════════════════════════════════════
+  // ═══════════════════════════════════════════
+  // SCORE HYBRIDE : IA 80% + votes 20%
+  // ═══════════════════════════════════════════
+  function scoreHybrid(scoreIA, nbVotes) {
+    const scoreIAPart   = scoreIA * 0.8;
+    const scoreVotePart = (Math.log(nbVotes + 1) / Math.log(MAX_VOTES_REF + 1)) * 20;
+    return Math.min(100, Math.round((scoreIAPart + scoreVotePart) * 10) / 10);
+  }
 
-  const voted = new Set();
-  let allArtworks = [];
+  // ═══════════════════════════════════════════
+  // ÉTAT LOCAL
+  // ═══════════════════════════════════════════
+  let allArtworks   = [];
+  let pendingVote   = null; // { id_participation, rang, btn, countEl, scoreEl, scoreIA }
 
-  // Données de démo pour test offline
-  const DEMO_DATA = {
-    semaine: "Semaine du 3 au 9 mars 2026",
-    numero_semaine: 9,
-    total_soumissions: 47,
-    total_votes: 128,
-    artworks: [
-      { rang: 1, prenom: "Camille R.", niveau: "Étudiant", challenge_id: 17, titre: "Portrait expressif avec ombre et lumière", score: 94.2, url_image: "", critique: "Une maîtrise remarquable des valeurs tonales. La source lumineuse unique crée un clair-obscur dramatique qui donne une profondeur émotionnelle rare pour ce niveau.", votes: 32 },
-      { rang: 2, prenom: "Théo M.", niveau: "Pro", challenge_id: 26, titre: "Planche manga 3 cases — scène sans dialogue", score: 91.5, url_image: "", critique: "", votes: 18 },
-      { rang: 3, prenom: "Léa D.", niveau: "Débutant", challenge_id: 27, titre: "Illustration de couverture — format portrait A4", score: 89.8, url_image: "", critique: "", votes: 15 },
-      { rang: 4, prenom: "Hugo B.", niveau: "Étudiant", challenge_id: 20, titre: "Poses dynamiques — 5 silhouettes en action", score: 87.3, url_image: "", critique: "", votes: 11 },
-      { rang: 5, prenom: "Jo", niveau: "Débutant", challenge_id: 2, titre: "Visage de face — méthode Loomis", score: 85.1, url_image: "", critique: "", votes: 9 },
-      { rang: 6, prenom: "Gaspard", niveau: "Pro", challenge_id: 16, titre: "Expressions manga — yeux et bouches expressifs", score: 84.7, url_image: "", critique: "", votes: 8 },
-      { rang: 7, prenom: "Emma V.", niveau: "Étudiant", challenge_id: 10, titre: "La main — étude de 5 positions différentes", score: 83.2, url_image: "", critique: "", votes: 7 },
-      { rang: 8, prenom: "Nora K.", niveau: "Débutant", challenge_id: 19, titre: "Character sheet — personnage original", score: 82.0, url_image: "", critique: "", votes: 6 },
-      { rang: 9, prenom: "Axel P.", niveau: "Étudiant", challenge_id: 24, titre: "Habiller mon personnage — tenue fantaisie", score: 81.4, url_image: "", critique: "", votes: 5 },
-      { rang: 10, prenom: "Inès F.", niveau: "Pro", challenge_id: 21, titre: "Raccourcis perspectifs — bras tendus", score: 80.9, url_image: "", critique: "", votes: 4 }
-    ]
-  };
+  // localStorage : email + votes déjà castés
+  const LS_EMAIL  = 'scolartist_email';
+  const LS_PSEUDO = 'scolartist_pseudo';
+  const LS_VOTED  = 'scolartist_voted'; // JSON array d'id_participation
 
+  function getVotedList() {
+    try { return JSON.parse(localStorage.getItem(LS_VOTED) || '[]'); }
+    catch { return []; }
+  }
+  function saveVoted(list) {
+    localStorage.setItem(LS_VOTED, JSON.stringify(list));
+  }
+  function hasVoted(id) { return getVotedList().includes(id); }
+  function addVoted(id) {
+    const list = getVotedList();
+    if (!list.includes(id)) { list.push(id); saveVoted(list); }
+  }
+  function removeVoted(id) {
+    saveVoted(getVotedList().filter(v => v !== id));
+  }
+
+  // ═══════════════════════════════════════════
+  // CHARGEMENT GALERIE
+  // ═══════════════════════════════════════════
   async function loadGallery() {
     try {
-      let data;
-
-      if (false) {
-        // Mode démo — données statiques
-        data = DEMO_DATA;
-        showToast('Mode démo — configure GALLERY_JSON_URL');
-      } else {
-        const res = await fetch(GALLERY_JSON_URL);
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        data = await res.json();
-      }
-
+      const res = await fetch(GALLERY_JSON_URL);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
       renderGallery(data);
-
     } catch (err) {
       console.error('Erreur chargement galerie:', err);
       document.getElementById('gallery').innerHTML = `
@@ -625,43 +696,43 @@
             Impossible de charger la galerie<br>
             <span style="color:var(--border)">${err.message}</span>
           </div>
-        </div>
-      `;
+        </div>`;
     }
   }
 
   function renderGallery(data) {
     allArtworks = data.artworks || [];
-
-    // Header
     document.getElementById('header-meta').textContent =
       `Day Drawing Challenge · Galerie publique · Semaine ${data.numero_semaine}`;
     document.getElementById('week-badge').textContent = data.semaine;
     document.getElementById('stat-soumissions').textContent = data.total_soumissions;
     document.getElementById('stat-selectionnes').textContent = allArtworks.length;
-    document.getElementById('stat-votes').textContent = data.total_votes;
-
+    document.getElementById('stat-votes').textContent = data.total_votes || 0;
     renderCards(allArtworks);
   }
 
   function renderCards(artworks) {
-    const gallery = document.getElementById('gallery');
-    const svgHeart = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>`;
+    const gallery   = document.getElementById('gallery');
+    const votedList = getVotedList();
+    const svgHeart  = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>`;
 
     gallery.innerHTML = artworks.map((a, idx) => {
-      const isTop1 = a.rang === 1 && artworks === allArtworks;
-      const rankClass = a.rang === 1 ? 'gold' : a.rang === 2 ? 'silver' : a.rang === 3 ? 'bronze' : 'normal';
-      const rankLabel = a.rang <= 3 ? a.rang : `#${a.rang}`;
-      const delay = `animation-delay: ${idx * 0.1 + 0.1}s`;
+      const isTop1     = a.rang === 1 && artworks === allArtworks;
+      const rankClass  = a.rang === 1 ? 'gold' : a.rang === 2 ? 'silver' : a.rang === 3 ? 'bronze' : 'normal';
+      const rankLabel  = a.rang <= 3 ? a.rang : `#${a.rang}`;
+      const delay      = `animation-delay: ${idx * 0.1 + 0.1}s`;
+      const id         = a.id_participation || String(a.rang);
+      const isVoted    = votedList.includes(id);
+      const nbVotes    = a.votes || 0;
+      const hybrid     = scoreHybrid(a.score, nbVotes);
 
       const imageHtml = a.url_image
-        ? `<img class="card-image" src="${a.url_image}" alt="Œuvre de ${a.prenom}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+        ? `<img class="card-image" src="${a.url_image}" alt="Œuvre de ${a.prenom}" loading="lazy"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
         : '';
       const placeholderHtml = `<div class="card-image-placeholder" style="${a.url_image ? 'display:none' : ''}">🎨</div>`;
-
       const critiqueHtml = a.critique
-        ? `<div class="card-critique">« ${a.critique} »</div>`
-        : '';
+        ? `<div class="card-critique">« ${a.critique} »</div>` : '';
 
       return `
         <article class="card${isTop1 ? ' top1' : ''}" data-niveau="${a.niveau}" style="${delay}">
@@ -669,8 +740,8 @@
           ${placeholderHtml}
           <div class="rank-badge ${rankClass}">${rankLabel}</div>
           <div class="score-overlay">
-            <div class="score-num">${a.score}</div>
-            <div class="score-label">Score IA</div>
+            <div class="score-num" id="score-hybrid-${id}">${hybrid}</div>
+            <div class="score-label">Score</div>
           </div>
           <div class="card-body">
             <div>
@@ -679,40 +750,176 @@
                 <span class="challenge-day">J · ${a.challenge_id}</span>
               </div>
               <div class="card-theme">${a.titre}</div>
-              <div>
-                <span class="card-skill">${a.niveau}</span>
-              </div>
+              <div><span class="card-skill">${a.niveau}</span></div>
               <div class="vote-section">
-                <button class="vote-btn${voted.has(a.rang) ? ' voted' : ''}" onclick="vote(this, ${a.rang})">
-                  ${svgHeart} Voter
+                <button class="vote-btn${isVoted ? ' voted' : ''}"
+                        onclick="vote(this, '${id}', '${a.prenom}', ${a.score})"
+                        data-id="${id}">
+                  ${svgHeart} ${isVoted ? 'Voté' : 'Voter'}
                 </button>
-                <span class="vote-count" id="votes-${a.rang}">${a.votes} votes</span>
+                <span class="vote-count" id="votes-${id}">${nbVotes} vote${nbVotes !== 1 ? 's' : ''}</span>
                 <button class="share-btn" onclick="share('${a.prenom}', ${a.challenge_id})">Partager →</button>
               </div>
             </div>
             ${isTop1 ? critiqueHtml : ''}
           </div>
-        </article>
-      `;
+        </article>`;
     }).join('');
   }
 
-  function vote(btn, id) {
-    const countEl = document.getElementById('votes-' + id);
-    const current = parseInt(countEl.textContent);
-    if (voted.has(id)) {
-      voted.delete(id);
-      btn.classList.remove('voted');
-      countEl.textContent = (current - 1) + ' votes';
-      showToast('Vote retiré');
+  // ═══════════════════════════════════════════
+  // VOTE — clic sur le bouton
+  // ═══════════════════════════════════════════
+  function vote(btn, id, prenom, scoreIA) {
+    const countEl  = document.getElementById('votes-' + id);
+    const scoreEl  = document.getElementById('score-hybrid-' + id);
+    const isVoted  = hasVoted(id);
+
+    if (isVoted) {
+      // Retrait du vote — direct, pas de modal
+      submitVoteDirect({ id, action: 'remove', btn, countEl, scoreEl, scoreIA });
+      return;
+    }
+
+    // Nouveau vote — email déjà connu ?
+    const savedEmail = localStorage.getItem(LS_EMAIL);
+    if (savedEmail) {
+      // Email connu → vote direct sans modal
+      const pseudo = localStorage.getItem(LS_PSEUDO) || '';
+      submitVoteDirect({ id, action: 'add', btn, countEl, scoreEl, scoreIA, email: savedEmail, pseudo });
     } else {
-      voted.add(id);
-      btn.classList.add('voted');
-      countEl.textContent = (current + 1) + ' votes';
-      showToast('✦ Merci pour votre vote !');
+      // Email inconnu → ouvrir modal
+      pendingVote = { id, action: 'add', btn, countEl, scoreEl, scoreIA };
+      openModal(prenom);
     }
   }
 
+  // ═══════════════════════════════════════════
+  // MODAL
+  // ═══════════════════════════════════════════
+  function openModal(prenom) {
+    document.getElementById('modal-artist-name').textContent = prenom;
+    document.getElementById('modal-email').value = localStorage.getItem(LS_EMAIL) || '';
+    document.getElementById('modal-pseudo').value = localStorage.getItem(LS_PSEUDO) || '';
+    document.getElementById('modal-overlay').classList.add('open');
+    setTimeout(() => document.getElementById('modal-email').focus(), 100);
+  }
+
+  function closeModal() {
+    document.getElementById('modal-overlay').classList.remove('open');
+    pendingVote = null;
+  }
+
+  // Fermer en cliquant hors du modal
+  document.getElementById('modal-overlay').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+
+  // Valider avec Entrée
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeModal();
+    if (e.key === 'Enter' && document.getElementById('modal-overlay').classList.contains('open')) {
+      submitVote();
+    }
+  });
+
+  function submitVote() {
+    const email  = document.getElementById('modal-email').value.trim().toLowerCase();
+    const pseudo = document.getElementById('modal-pseudo').value.trim();
+
+    if (!email || !email.includes('@')) {
+      showToast('Entre un email valide pour voter');
+      document.getElementById('modal-email').focus();
+      return;
+    }
+
+    // Sauvegarder en localStorage
+    localStorage.setItem(LS_EMAIL, email);
+    if (pseudo) localStorage.setItem(LS_PSEUDO, pseudo);
+
+    closeModal();
+
+    if (pendingVote) {
+      submitVoteDirect({ ...pendingVote, email, pseudo });
+      pendingVote = null;
+    }
+  }
+
+  // ═══════════════════════════════════════════
+  // APPEL WEBHOOK n8n
+  // ═══════════════════════════════════════════
+  async function submitVoteDirect({ id, action, btn, countEl, scoreEl, scoreIA, email, pseudo }) {
+    // Mise à jour optimiste de l'UI
+    btn.classList.add('loading');
+    const currentVotes = parseInt(countEl.textContent) || 0;
+    const newVotes     = action === 'add' ? currentVotes + 1 : Math.max(0, currentVotes - 1);
+
+    if (action === 'add') {
+      btn.classList.add('voted');
+      btn.innerHTML = btn.innerHTML.replace('Voter', 'Voté');
+      addVoted(id);
+    } else {
+      btn.classList.remove('voted');
+      btn.innerHTML = btn.innerHTML.replace('Voté', 'Voter');
+      removeVoted(id);
+    }
+
+    countEl.textContent = `${newVotes} vote${newVotes !== 1 ? 's' : ''}`;
+    if (scoreEl) scoreEl.textContent = scoreHybrid(scoreIA, newVotes);
+
+    // Mise à jour stat header
+    const statVotes = document.getElementById('stat-votes');
+    const totalActuel = parseInt(statVotes.textContent) || 0;
+    statVotes.textContent = action === 'add' ? totalActuel + 1 : Math.max(0, totalActuel - 1);
+
+    try {
+      const res = await fetch(VOTE_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id_participation: id,
+          email:  email || localStorage.getItem(LS_EMAIL) || '',
+          pseudo: pseudo || localStorage.getItem(LS_PSEUDO) || '',
+          action
+        })
+      });
+
+      const data = await res.json();
+
+      if (data.ok) {
+        showToast(action === 'add' ? '✦ Vote enregistré !' : 'Vote retiré');
+      } else {
+        // Rollback si erreur serveur
+        rollbackVote({ action, btn, countEl, scoreEl, scoreIA, currentVotes, id });
+        showToast(data.message || 'Erreur lors du vote');
+      }
+    } catch (err) {
+      // Rollback si réseau KO
+      rollbackVote({ action, btn, countEl, scoreEl, scoreIA, currentVotes, id });
+      showToast('Connexion impossible — réessaie');
+      console.error('Vote error:', err);
+    } finally {
+      btn.classList.remove('loading');
+    }
+  }
+
+  function rollbackVote({ action, btn, countEl, scoreEl, scoreIA, currentVotes, id }) {
+    if (action === 'add') {
+      btn.classList.remove('voted');
+      btn.innerHTML = btn.innerHTML.replace('Voté', 'Voter');
+      removeVoted(id);
+    } else {
+      btn.classList.add('voted');
+      btn.innerHTML = btn.innerHTML.replace('Voter', 'Voté');
+      addVoted(id);
+    }
+    countEl.textContent = `${currentVotes} vote${currentVotes !== 1 ? 's' : ''}`;
+    if (scoreEl) scoreEl.textContent = scoreHybrid(scoreIA, currentVotes);
+  }
+
+  // ═══════════════════════════════════════════
+  // PARTAGE
+  // ═══════════════════════════════════════════
   function share(artist, day) {
     const text = `Je vote pour ${artist} — Défi J${day} sur Scolartist ! 🎨`;
     if (navigator.share) {
@@ -723,6 +930,9 @@
     }
   }
 
+  // ═══════════════════════════════════════════
+  // FILTRE
+  // ═══════════════════════════════════════════
   function filterCards(niveau, btn) {
     document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
@@ -732,6 +942,9 @@
     renderCards(filtered);
   }
 
+  // ═══════════════════════════════════════════
+  // TOAST
+  // ═══════════════════════════════════════════
   function showToast(msg) {
     const toast = document.getElementById('toast');
     toast.textContent = msg;
