@@ -498,7 +498,7 @@
       const id        = a.id_participation || String(a.rang);
       const isVoted   = votedList.includes(id);
       const nbVotes   = a.votes || 0;
-      const hybrid    = scoreHybrid(a.score, nbVotes);
+      const hybrid    = a.score; // Score IA pur — votes servent uniquement aux notifications
       const manga     = isManga(a.discipline);
 
       const imageHtml = a.url_image
@@ -511,7 +511,7 @@
         imageHtml + placeholderHtml +
         '<div class="rank-badge ' + rankClass + '">' + rankLabel + '</div>' +
         (manga ? '<div class="manga-badge">Manga</div>' : '') +
-        '<div class="score-overlay"><div class="score-num" id="score-hybrid-' + id + '">' + hybrid + '</div><div class="score-label">Score</div></div>' +
+        '<div class="score-overlay"><div class="score-num" id="score-hybrid-' + id + '">' + hybrid + '</div><div class="score-label">Score IA</div></div>' +
         '<div class="card-body"><div>' +
         '<div class="card-meta"><span class="artist-name">' + a.prenom + '</span><span class="challenge-day">J · ' + a.challenge_id + '</span></div>' +
         '<div class="card-tags">' +
