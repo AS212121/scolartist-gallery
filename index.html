@@ -73,6 +73,64 @@
   .stat-num { font-family: 'Cormorant Garamond', serif; font-size: 2.5rem; font-weight: 300; color: var(--cream); line-height: 1; }
   .stat-label { font-size: 0.55rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-top: 0.2rem; }
 
+  /* JAUGE ÂGE */
+  .age-gauge {
+    padding: 1.5rem 4rem;
+    border-bottom: 1px solid var(--border);
+    display: none;
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+  .age-gauge-title {
+    font-size: 0.55rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.2rem;
+  }
+  .age-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .age-row-label {
+    font-size: 0.55rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    width: 60px;
+    flex-shrink: 0;
+  }
+  .age-bar-track {
+    flex: 1;
+    height: 2px;
+    background: var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+  .age-bar-fill {
+    height: 100%;
+    background: var(--gold);
+    transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+    width: 0%;
+  }
+  .age-bar-fill.ados { background: #7eb8c4; }
+  .age-bar-fill.adultes { background: #c49e7e; }
+  .age-row-count {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1rem;
+    color: var(--cream);
+    width: 32px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .age-row-pct {
+    font-size: 0.5rem;
+    color: var(--muted);
+    width: 32px;
+    flex-shrink: 0;
+  }
+
   /* FILTRES */
   .filters-wrap {
     border-bottom: 1px solid var(--border);
@@ -217,6 +275,31 @@
   .card.top1 .card-critique { display: block; }
   .card-critique { display: none; font-size: 0.7rem; line-height: 1.6; color: var(--muted); border-left: 2px solid var(--gold); padding-left: 1rem; font-style: italic; margin-top: 0.5rem; }
 
+  /* VOIR PLUS */
+  .voir-plus-wrap {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    padding: 2rem 0 1rem;
+    background: var(--bg);
+  }
+  .voir-plus-btn {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 0.8rem 2.5rem;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.25s;
+  }
+  .voir-plus-btn:hover { border-color: var(--gold); color: var(--gold); }
+  .voir-plus-count { font-size: 0.5rem; color: var(--muted); letter-spacing: 0.1em; }
+
   /* MODAL */
   .modal-overlay { position: fixed; inset: 0; background: rgba(10,10,10,0.92); backdrop-filter: blur(8px); z-index: 900; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.25s; }
   .modal-overlay.open { opacity: 1; pointer-events: all; }
@@ -250,7 +333,7 @@
   @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
   @media (max-width: 768px) {
-    header, .hero, .filters-primary, .filters-secondary, .filters-tertiary, .gallery, footer { padding-left: 1.5rem; padding-right: 1.5rem; }
+    header, .hero, .age-gauge, .filters-primary, .filters-secondary, .filters-tertiary, .gallery, footer { padding-left: 1.5rem; padding-right: 1.5rem; }
     .hero { grid-template-columns: 1fr; }
     .hero-right { align-items: flex-start; }
     .hero-stats { justify-content: flex-start; }
@@ -279,6 +362,29 @@
     </div>
   </div>
 </section>
+
+<!-- JAUGE ÂGE -->
+<div class="age-gauge" id="age-gauge">
+  <div class="age-gauge-title">Répartition par âge</div>
+  <div class="age-row">
+    <div class="age-row-label">Enfants</div>
+    <div class="age-bar-track"><div class="age-bar-fill" id="bar-enfants"></div></div>
+    <div class="age-row-count" id="count-enfants">0</div>
+    <div class="age-row-pct" id="pct-enfants">0%</div>
+  </div>
+  <div class="age-row">
+    <div class="age-row-label">Ados</div>
+    <div class="age-bar-track"><div class="age-bar-fill ados" id="bar-ados"></div></div>
+    <div class="age-row-count" id="count-ados">0</div>
+    <div class="age-row-pct" id="pct-ados">0%</div>
+  </div>
+  <div class="age-row">
+    <div class="age-row-label">Adultes</div>
+    <div class="age-bar-track"><div class="age-bar-fill adultes" id="bar-adultes"></div></div>
+    <div class="age-row-count" id="count-adultes">0</div>
+    <div class="age-row-pct" id="pct-adultes">0%</div>
+  </div>
+</div>
 
 <div class="filters-wrap">
   <div class="filters-primary" id="filters-primary">
@@ -337,6 +443,7 @@
   const GALLERY_JSON_URL = 'https://schlum.app.n8n.cloud/webhook/gallery-data';
   const VOTE_URL         = 'https://schlum.app.n8n.cloud/webhook/vote';
   const MAX_VOTES_REF    = 50;
+  const PAGE_SIZE        = 10;
 
   const AGE_GROUPS = {
     enfants: ['3-5 ans', '6-8 ans', '9-12 ans'],
@@ -347,7 +454,7 @@
   function getNiveauCategory(niveau) {
     const n = (niveau || '').toLowerCase();
     if (n.includes('avance') || n.includes('avanc') || n.includes('expert')) return 'pro';
-    return 'debutant'; // Debutant + Intermediaire = Debutants
+    return 'debutant';
   }
 
   function isManga(discipline) {
@@ -360,9 +467,11 @@
     return Math.min(100, Math.round((ia + vote) * 10) / 10);
   }
 
-  let allArtworks = [];
-  let activeFilters = { primary: 'all', secondary: 'all', tertiary: 'all' };
-  let pendingVote = null;
+  let allArtworks    = [];
+  let currentFiltered = [];
+  let currentPage    = PAGE_SIZE;
+  let activeFilters  = { primary: 'all', secondary: 'all', tertiary: 'all' };
+  let pendingVote    = null;
 
   const LS_EMAIL  = 'scolartist_email';
   const LS_PSEUDO = 'scolartist_pseudo';
@@ -393,10 +502,32 @@
     document.getElementById('stat-soumissions').textContent = data.total_soumissions;
     document.getElementById('stat-selectionnes').textContent = allArtworks.length;
     document.getElementById('stat-votes').textContent = data.total_votes || 0;
+    renderAgeGauge(allArtworks);
     applyFilters();
   }
 
-  // Groupes d'age disponibles par categorie principale
+  function renderAgeGauge(artworks) {
+    if (!artworks.length) return;
+    const counts = { enfants: 0, ados: 0, adultes: 0 };
+    artworks.forEach(function(a) {
+      const age = (a.age || '').trim();
+      if (AGE_GROUPS.enfants.includes(age)) counts.enfants++;
+      else if (AGE_GROUPS.ados.includes(age)) counts.ados++;
+      else counts.adultes++;
+    });
+    const total = artworks.length;
+    const gauge = document.getElementById('age-gauge');
+    gauge.style.display = 'flex';
+    ['enfants', 'ados', 'adultes'].forEach(function(g) {
+      const pct = total > 0 ? Math.round((counts[g] / total) * 100) : 0;
+      document.getElementById('count-' + g).textContent = counts[g];
+      document.getElementById('pct-' + g).textContent = pct + '%';
+      setTimeout(function() {
+        document.getElementById('bar-' + g).style.width = pct + '%';
+      }, 300);
+    });
+  }
+
   const AGE_BY_CATEGORY = {
     debutant: ['enfants', 'ados', 'adultes'],
     pro:      ['enfants', 'ados', 'adultes'],
@@ -413,7 +544,7 @@
     activeFilters.primary = value;
     activeFilters.secondary = 'all';
     activeFilters.tertiary = 'all';
-    document.querySelectorAll('.filters-primary .filter-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.filters-primary .filter-btn').forEach(function(b) { b.classList.remove('active'); });
     btn.classList.add('active');
 
     const sec = document.getElementById('filters-secondary');
@@ -424,7 +555,7 @@
       const groups = AGE_BY_CATEGORY[value];
       sec.innerHTML = '<span class="filter-label">Groupe :</span>' +
         '<button class="filter-btn active" onclick="filterSecondary(\'all\', this)">Tous ages</button>' +
-        groups.map(g => '<button class="filter-btn" onclick="filterSecondary(\'' + g + '\', this)">' + AGE_LABELS[g] + '</button>').join('');
+        groups.map(function(g) { return '<button class="filter-btn" onclick="filterSecondary(\'' + g + '\', this)">' + AGE_LABELS[g] + '</button>'; }).join('');
       sec.classList.add('visible');
     } else {
       sec.classList.remove('visible');
@@ -435,7 +566,7 @@
   function filterSecondary(value, btn) {
     activeFilters.secondary = value;
     activeFilters.tertiary = 'all';
-    document.querySelectorAll('.filters-secondary .filter-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.filters-secondary .filter-btn').forEach(function(b) { b.classList.remove('active'); });
     btn.classList.add('active');
 
     const ter = document.getElementById('filters-tertiary');
@@ -444,7 +575,7 @@
     if (value !== 'all' && value !== 'adultes' && ages && ages.length > 0) {
       ter.innerHTML = '<span class="filter-label">Age :</span>' +
         '<button class="filter-btn active" onclick="filterTertiary(\'all\', this)">Tous</button>' +
-        ages.map(a => '<button class="filter-btn" onclick="filterTertiary(\'' + a + '\', this)">' + a + '</button>').join('');
+        ages.map(function(a) { return '<button class="filter-btn" onclick="filterTertiary(\'' + a + '\', this)">' + a + '</button>'; }).join('');
       ter.classList.add('visible');
     } else {
       ter.classList.remove('visible');
@@ -454,64 +585,73 @@
 
   function filterTertiary(value, btn) {
     activeFilters.tertiary = value;
-    document.querySelectorAll('.filters-tertiary .filter-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.filters-tertiary .filter-btn').forEach(function(b) { b.classList.remove('active'); });
     btn.classList.add('active');
     applyFilters();
   }
 
   function applyFilters() {
-    let f = allArtworks;
-    const { primary, secondary, tertiary } = activeFilters;
+    var f = allArtworks;
+    var primary = activeFilters.primary;
+    var secondary = activeFilters.secondary;
+    var tertiary = activeFilters.tertiary;
 
     if (primary === 'manga') {
-      f = f.filter(a => isManga(a.discipline));
+      f = f.filter(function(a) { return isManga(a.discipline); });
     } else if (primary !== 'all') {
-      f = f.filter(a => getNiveauCategory(a.niveau) === primary);
+      f = f.filter(function(a) { return getNiveauCategory(a.niveau) === primary; });
     }
 
     if (secondary !== 'all' && AGE_GROUPS[secondary]) {
-      f = f.filter(a => AGE_GROUPS[secondary].includes(a.age));
+      f = f.filter(function(a) { return AGE_GROUPS[secondary].includes(a.age); });
     }
 
     if (tertiary !== 'all') {
-      f = f.filter(a => a.age === tertiary);
+      f = f.filter(function(a) { return a.age === tertiary; });
     }
 
-    renderCards(f);
+    currentFiltered = f;
+    currentPage = PAGE_SIZE;
+    renderCards(currentFiltered.slice(0, currentPage));
+  }
+
+  function loadMore() {
+    currentPage += PAGE_SIZE;
+    renderCards(currentFiltered.slice(0, currentPage));
   }
 
   function renderCards(artworks) {
-    const gallery = document.getElementById('gallery');
-    const votedList = getVotedList();
-    const svgHeart = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>';
+    var gallery = document.getElementById('gallery');
+    var votedList = getVotedList();
+    var svgHeart = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>';
 
     if (artworks.length === 0) {
       gallery.innerHTML = '<div class="empty-state"><div class="empty-icon">+</div><div class="empty-text">Aucune oeuvre dans cette categorie</div></div>';
       return;
     }
 
-    gallery.innerHTML = artworks.map((a, idx) => {
-      const isTop1    = a.rang === 1 && activeFilters.primary === 'all' && activeFilters.secondary === 'all';
-      const rankClass = a.rang === 1 ? 'gold' : a.rang === 2 ? 'silver' : a.rang === 3 ? 'bronze' : 'normal';
-      const rankLabel = a.rang <= 3 ? a.rang : '#' + a.rang;
-      const delay     = 'animation-delay: ' + (idx * 0.08 + 0.1) + 's';
-      const id        = a.id_participation || String(a.rang);
-      const isVoted   = votedList.includes(id);
-      const nbVotes   = a.votes || 0;
-      const hybrid    = a.score; // Score IA pur — votes servent uniquement aux notifications
-      const manga     = isManga(a.discipline);
+    var cards = artworks.map(function(a, idx) {
+      var isTop1    = a.rang === 1 && activeFilters.primary === 'all' && activeFilters.secondary === 'all';
+      var rankClass = a.rang === 1 ? 'gold' : a.rang === 2 ? 'silver' : a.rang === 3 ? 'bronze' : 'normal';
+      var rankLabel = a.rang <= 3 ? a.rang : '#' + a.rang;
+      var delay     = 'animation-delay: ' + (idx * 0.06 + 0.1) + 's';
+      var id        = a.id_participation || String(a.rang);
+      var isVoted   = votedList.includes(id);
+      var nbVotes   = a.votes || 0;
+      var score     = a.score;
+      var manga     = isManga(a.discipline);
 
-      const imageHtml = a.url_image
+      var imageHtml = a.url_image
         ? '<img class="card-image" src="' + a.url_image + '" alt="Oeuvre de ' + a.prenom + '" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">'
         : '';
-      const placeholderHtml = '<div class="card-image-placeholder" style="' + (a.url_image ? 'display:none' : '') + '">&#127912;</div>';
-      const critiqueHtml = a.critique ? '<div class="card-critique">« ' + a.critique + ' »</div>' : '';
+      var placeholderHtml = '<div class="card-image-placeholder" style="' + (a.url_image ? 'display:none' : '') + '">&#127912;</div>';
+      var critiqueHtml = a.critique ? '<div class="card-critique">« ' + a.critique + ' »</div>' : '';
 
       return '<article class="card' + (isTop1 ? ' top1' : '') + '" style="' + delay + '">' +
         imageHtml + placeholderHtml +
         '<div class="rank-badge ' + rankClass + '">' + rankLabel + '</div>' +
         (manga ? '<div class="manga-badge">Manga</div>' : '') +
-        '<div class="score-overlay"><div class="score-num" id="score-hybrid-' + id + '">' + hybrid + '</div><div class="score-label">Score IA</div></div>' +
+        '<div class="score-overlay"><div class="score-num" id="score-hybrid-' + id + '">' + score + '</div><div class="score-label">Score IA</div></div>' +
         '<div class="card-body"><div>' +
         '<div class="card-meta"><span class="artist-name">' + a.prenom + '</span><span class="challenge-day">J · ' + a.challenge_id + '</span></div>' +
         '<div class="card-tags">' +
@@ -521,28 +661,35 @@
         '</div>' +
         '<div class="card-theme">' + a.titre + '</div>' +
         '<div class="vote-section">' +
-        '<button class="vote-btn' + (isVoted ? ' voted' : '') + '" onclick="vote(this, \'' + id + '\', \'' + a.prenom + '\', ' + a.score + ')" data-id="' + id + '">' +
+        '<button class="vote-btn' + (isVoted ? ' voted' : '') + '" onclick="vote(this, \'' + id + '\', \'' + a.prenom + '\', ' + score + ')" data-id="' + id + '">' +
         svgHeart + ' ' + (isVoted ? 'Vote' : 'Voter') + '</button>' +
         '<span class="vote-count" id="votes-' + id + '">' + nbVotes + ' vote' + (nbVotes !== 1 ? 's' : '') + '</span>' +
         '<button class="share-btn" onclick="share(\'' + a.prenom + '\', ' + a.challenge_id + ')">Partager</button>' +
         '</div></div>' + (isTop1 ? critiqueHtml : '') + '</div></article>';
     }).join('');
+
+    var remaining = currentFiltered.length - currentPage;
+    var voirPlus = remaining > 0
+      ? '<div class="voir-plus-wrap"><button class="voir-plus-btn" onclick="loadMore()">Voir plus</button><span class="voir-plus-count">+ ' + remaining + ' œuvre' + (remaining > 1 ? 's' : '') + '</span></div>'
+      : '';
+
+    gallery.innerHTML = cards + voirPlus;
   }
 
   function vote(btn, id, prenom, scoreIA) {
-    const countEl = document.getElementById('votes-' + id);
-    const scoreEl = document.getElementById('score-hybrid-' + id);
-    const isVoted = hasVoted(id);
+    var countEl = document.getElementById('votes-' + id);
+    var scoreEl = document.getElementById('score-hybrid-' + id);
+    var isVoted = hasVoted(id);
 
     if (isVoted) {
-      submitVoteDirect({ id, action: 'remove', btn, countEl, scoreEl, scoreIA });
+      submitVoteDirect({ id: id, action: 'remove', btn: btn, countEl: countEl, scoreEl: scoreEl, scoreIA: scoreIA });
       return;
     }
-    const savedEmail = localStorage.getItem(LS_EMAIL);
+    var savedEmail = localStorage.getItem(LS_EMAIL);
     if (savedEmail) {
-      submitVoteDirect({ id, action: 'add', btn, countEl, scoreEl, scoreIA, email: savedEmail, pseudo: localStorage.getItem(LS_PSEUDO) || '' });
+      submitVoteDirect({ id: id, action: 'add', btn: btn, countEl: countEl, scoreEl: scoreEl, scoreIA: scoreIA, email: savedEmail, pseudo: localStorage.getItem(LS_PSEUDO) || '' });
     } else {
-      pendingVote = { id, action: 'add', btn, countEl, scoreEl, scoreIA };
+      pendingVote = { id: id, action: 'add', btn: btn, countEl: countEl, scoreEl: scoreEl, scoreIA: scoreIA };
       openModal(prenom);
     }
   }
@@ -567,37 +714,36 @@
   });
 
   function submitVote() {
-    const email  = document.getElementById('modal-email').value.trim().toLowerCase();
-    const pseudo = document.getElementById('modal-pseudo').value.trim();
+    var email  = document.getElementById('modal-email').value.trim().toLowerCase();
+    var pseudo = document.getElementById('modal-pseudo').value.trim();
     if (!email || !email.includes('@')) { showToast('Entre un email valide'); document.getElementById('modal-email').focus(); return; }
     localStorage.setItem(LS_EMAIL, email);
     if (pseudo) localStorage.setItem(LS_PSEUDO, pseudo);
     closeModal();
-    if (pendingVote) { submitVoteDirect(Object.assign({}, pendingVote, { email, pseudo })); pendingVote = null; }
+    if (pendingVote) { submitVoteDirect(Object.assign({}, pendingVote, { email: email, pseudo: pseudo })); pendingVote = null; }
   }
 
   async function submitVoteDirect(opts) {
-    const { id, action, btn, countEl, scoreEl, scoreIA, email, pseudo } = opts;
+    var id = opts.id, action = opts.action, btn = opts.btn, countEl = opts.countEl, scoreEl = opts.scoreEl, scoreIA = opts.scoreIA, email = opts.email, pseudo = opts.pseudo;
     btn.classList.add('loading');
-    const cur = parseInt(countEl.textContent) || 0;
-    const nv  = action === 'add' ? cur + 1 : Math.max(0, cur - 1);
+    var cur = parseInt(countEl.textContent) || 0;
+    var nv  = action === 'add' ? cur + 1 : Math.max(0, cur - 1);
 
     if (action === 'add') { btn.classList.add('voted'); btn.innerHTML = btn.innerHTML.replace('Voter', 'Vote'); addVoted(id); }
     else { btn.classList.remove('voted'); btn.innerHTML = btn.innerHTML.replace('Vote', 'Voter'); removeVoted(id); }
 
     countEl.textContent = nv + ' vote' + (nv !== 1 ? 's' : '');
-    if (scoreEl) scoreEl.textContent = scoreHybrid(scoreIA, nv);
 
-    const sv = document.getElementById('stat-votes');
+    var sv = document.getElementById('stat-votes');
     sv.textContent = action === 'add' ? (parseInt(sv.textContent) || 0) + 1 : Math.max(0, (parseInt(sv.textContent) || 0) - 1);
 
     try {
-      const res = await fetch(VOTE_URL, {
+      var res = await fetch(VOTE_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id_participation: id, email: email || localStorage.getItem(LS_EMAIL) || '', pseudo: pseudo || localStorage.getItem(LS_PSEUDO) || '', action })
+        body: JSON.stringify({ id_participation: id, email: email || localStorage.getItem(LS_EMAIL) || '', pseudo: pseudo || localStorage.getItem(LS_PSEUDO) || '', action: action })
       });
-      const data = await res.json();
+      var data = await res.json();
       if (data.ok) { showToast(action === 'add' ? 'Vote enregistre !' : 'Vote retire'); }
       else { rollback(opts, cur); showToast(data.message || 'Erreur vote'); }
     } catch (e) {
@@ -606,21 +752,21 @@
     } finally { btn.classList.remove('loading'); }
   }
 
-  function rollback({ action, btn, countEl, scoreEl, scoreIA, id }, cur) {
+  function rollback(opts, cur) {
+    var action = opts.action, btn = opts.btn, countEl = opts.countEl, id = opts.id;
     if (action === 'add') { btn.classList.remove('voted'); btn.innerHTML = btn.innerHTML.replace('Vote', 'Voter'); removeVoted(id); }
     else { btn.classList.add('voted'); btn.innerHTML = btn.innerHTML.replace('Voter', 'Vote'); addVoted(id); }
     countEl.textContent = cur + ' vote' + (cur !== 1 ? 's' : '');
-    if (scoreEl) scoreEl.textContent = scoreHybrid(scoreIA, cur);
   }
 
   function share(artist, day) {
-    const text = 'Je vote pour ' + artist + ' - Defi J' + day + ' sur Scolartist !';
-    if (navigator.share) { navigator.share({ title: 'Scolartist Gallery', text, url: window.location.href }); }
+    var text = 'Je vote pour ' + artist + ' - Defi J' + day + ' sur Scolartist !';
+    if (navigator.share) { navigator.share({ title: 'Scolartist Gallery', text: text, url: window.location.href }); }
     else { navigator.clipboard.writeText(text + ' ' + window.location.href); showToast('Lien copie !'); }
   }
 
   function showToast(msg) {
-    const t = document.getElementById('toast');
+    var t = document.getElementById('toast');
     t.textContent = msg;
     t.classList.add('show');
     setTimeout(function() { t.classList.remove('show'); }, 2500);
