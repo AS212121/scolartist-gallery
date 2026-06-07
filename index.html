@@ -17,6 +17,8 @@
     --text: #e8e4dc;
     --manga: #8b4c8b;
     --manga-light: #c47fc4;
+    --kids: #2d8a4e;
+    --kids-light: #5ec47a;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -81,55 +83,15 @@
     flex-direction: column;
     gap: 0.8rem;
   }
-  .age-gauge-title {
-    font-size: 0.55rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 0.2rem;
-  }
-  .age-row {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-  }
-  .age-row-label {
-    font-size: 0.55rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--muted);
-    width: 60px;
-    flex-shrink: 0;
-  }
-  .age-bar-track {
-    flex: 1;
-    height: 2px;
-    background: var(--border);
-    position: relative;
-    overflow: hidden;
-  }
-  .age-bar-fill {
-    height: 100%;
-    background: var(--gold);
-    transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
-    width: 0%;
-  }
+  .age-gauge-title { font-size: 0.55rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.2rem; }
+  .age-row { display: flex; align-items: center; gap: 1rem; }
+  .age-row-label { font-size: 0.55rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); width: 60px; flex-shrink: 0; }
+  .age-bar-track { flex: 1; height: 2px; background: var(--border); position: relative; overflow: hidden; }
+  .age-bar-fill { height: 100%; background: var(--gold); transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); width: 0%; }
   .age-bar-fill.ados { background: #7eb8c4; }
   .age-bar-fill.adultes { background: #c49e7e; }
-  .age-row-count {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1rem;
-    color: var(--cream);
-    width: 32px;
-    text-align: right;
-    flex-shrink: 0;
-  }
-  .age-row-pct {
-    font-size: 0.5rem;
-    color: var(--muted);
-    width: 32px;
-    flex-shrink: 0;
-  }
+  .age-row-count { font-family: 'Cormorant Garamond', serif; font-size: 1rem; color: var(--cream); width: 32px; text-align: right; flex-shrink: 0; }
+  .age-row-pct { font-size: 0.5rem; color: var(--muted); width: 32px; flex-shrink: 0; }
 
   /* FILTRES */
   .filters-wrap {
@@ -140,65 +102,32 @@
     top: 73px;
     z-index: 90;
   }
-
-  .filters-primary {
-    padding: 1.2rem 4rem;
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
-  }
-
+  .filters-primary { padding: 1.2rem 4rem; display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
   .filters-secondary {
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
-    overflow: hidden;
-    max-height: 0;
-    padding: 0 4rem;
-    transition: max-height 0.3s ease, padding 0.3s ease, border-color 0.3s;
+    display: flex; gap: 0.5rem; align-items: center; overflow: hidden;
+    max-height: 0; padding: 0 4rem; transition: max-height 0.3s ease, padding 0.3s ease, border-color 0.3s;
     border-top: 1px solid transparent;
   }
-  .filters-secondary.visible {
-    max-height: 70px;
-    padding: 0.8rem 4rem;
-    border-top-color: var(--border);
-  }
-
+  .filters-secondary.visible { max-height: 70px; padding: 0.8rem 4rem; border-top-color: var(--border); }
   .filters-tertiary {
-    display: flex;
-    gap: 0.4rem;
-    align-items: center;
-    overflow: hidden;
-    max-height: 0;
-    padding: 0 4rem;
-    transition: max-height 0.3s ease, padding 0.3s ease, border-color 0.3s;
+    display: flex; gap: 0.4rem; align-items: center; overflow: hidden;
+    max-height: 0; padding: 0 4rem; transition: max-height 0.3s ease, padding 0.3s ease, border-color 0.3s;
     border-top: 1px solid transparent;
   }
-  .filters-tertiary.visible {
-    max-height: 60px;
-    padding: 0.6rem 4rem;
-    border-top-color: var(--border);
-  }
+  .filters-tertiary.visible { max-height: 60px; padding: 0.6rem 4rem; border-top-color: var(--border); }
 
   .filter-label { font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-right: 0.8rem; white-space: nowrap; }
-
   .filter-btn {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.6rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    padding: 0.4rem 1rem;
-    border: 1px solid var(--border);
-    background: transparent;
-    color: var(--muted);
-    cursor: pointer;
-    transition: all 0.2s;
-    white-space: nowrap;
+    font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 0.4rem 1rem; border: 1px solid var(--border); background: transparent; color: var(--muted);
+    cursor: pointer; transition: all 0.2s; white-space: nowrap;
   }
   .filter-btn:hover { border-color: var(--gold); color: var(--gold); }
   .filter-btn.active { border-color: var(--gold); color: var(--gold); background: rgba(201,168,76,0.08); }
   .filter-btn.manga-btn:hover,
   .filter-btn.manga-btn.active { border-color: var(--manga-light); color: var(--manga-light); background: rgba(139,76,139,0.08); }
+  .filter-btn.kids-btn:hover,
+  .filter-btn.kids-btn.active { border-color: var(--kids-light); color: var(--kids-light); background: rgba(45,138,78,0.08); }
 
   /* GALLERY */
   .gallery {
@@ -238,7 +167,10 @@
   .rank-badge.bronze { background: #a0622a; }
   .rank-badge.normal { background: var(--surface); color: var(--muted); border: 1px solid var(--border); font-size: 0.7rem; font-family: 'DM Mono', monospace; }
 
-  .manga-badge { position: absolute; top: 1rem; right: 1rem; padding: 0.2rem 0.5rem; font-size: 0.45rem; letter-spacing: 0.1em; text-transform: uppercase; background: rgba(139,76,139,0.85); color: var(--manga-light); border: 1px solid var(--manga); z-index: 2; backdrop-filter: blur(4px); }
+  /* Badges discipline */
+  .disc-badge { position: absolute; top: 1rem; right: 1rem; padding: 0.2rem 0.5rem; font-size: 0.45rem; letter-spacing: 0.1em; text-transform: uppercase; z-index: 2; backdrop-filter: blur(4px); }
+  .disc-badge.manga { background: rgba(139,76,139,0.85); color: var(--manga-light); border: 1px solid var(--manga); }
+  .disc-badge.kids { background: rgba(45,138,78,0.85); color: var(--kids-light); border: 1px solid var(--kids); }
 
   .score-overlay { position: absolute; bottom: 0; right: 0; background: rgba(10,10,10,0.85); border-top: 1px solid var(--gold); border-left: 1px solid var(--gold); padding: 0.3rem 0.6rem; z-index: 2; backdrop-filter: blur(4px); }
   .score-num { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; font-weight: 600; color: var(--gold-light); line-height: 1; }
@@ -254,6 +186,8 @@
   .tag.niveau { border-color: rgba(201,168,76,0.3); color: var(--gold); }
   .tag.age { border-color: rgba(255,255,255,0.1); color: rgba(247,244,239,0.4); }
   .tag.manga-tag { border-color: rgba(139,76,139,0.4); color: var(--manga-light); }
+  .tag.kids-tag { border-color: rgba(45,138,78,0.4); color: var(--kids-light); }
+  .tag.grade-tag { border-color: rgba(201,168,76,0.6); color: var(--gold-light); font-weight: 600; letter-spacing: 0.12em; }
 
   .card-theme { font-family: 'Cormorant Garamond', serif; font-size: 0.9rem; font-style: italic; color: var(--muted); margin-bottom: 0.8rem; line-height: 1.3; }
 
@@ -276,27 +210,8 @@
   .card-critique { display: none; font-size: 0.7rem; line-height: 1.6; color: var(--muted); border-left: 2px solid var(--gold); padding-left: 1rem; font-style: italic; margin-top: 0.5rem; }
 
   /* VOIR PLUS */
-  .voir-plus-wrap {
-    grid-column: 1 / -1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 1rem;
-    padding: 2rem 0 1rem;
-    background: var(--bg);
-  }
-  .voir-plus-btn {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.6rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    padding: 0.8rem 2.5rem;
-    border: 1px solid var(--border);
-    background: transparent;
-    color: var(--muted);
-    cursor: pointer;
-    transition: all 0.25s;
-  }
+  .voir-plus-wrap { grid-column: 1 / -1; display: flex; justify-content: center; align-items: center; gap: 1rem; padding: 2rem 0 1rem; background: var(--bg); }
+  .voir-plus-btn { font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; padding: 0.8rem 2.5rem; border: 1px solid var(--border); background: transparent; color: var(--muted); cursor: pointer; transition: all 0.25s; }
   .voir-plus-btn:hover { border-color: var(--gold); color: var(--gold); }
   .voir-plus-count { font-size: 0.5rem; color: var(--muted); letter-spacing: 0.1em; }
 
@@ -393,6 +308,7 @@
     <button class="filter-btn" onclick="filterPrimary('debutant', this)">Debutants</button>
     <button class="filter-btn" onclick="filterPrimary('pro', this)">Pro</button>
     <button class="filter-btn manga-btn" onclick="filterPrimary('manga', this)">Manga</button>
+    <button class="filter-btn kids-btn" onclick="filterPrimary('kids', this)">Kids</button>
   </div>
   <div class="filters-secondary" id="filters-secondary">
     <span class="filter-label">Groupe :</span>
@@ -451,45 +367,48 @@
     adultes: ['Adulte', '19-99 ans']
   };
 
+  function getDiscipline(discipline) {
+    var d = (discipline || '').toLowerCase();
+    if (d.includes('manga')) return 'manga';
+    if (d.includes('kids') || d.includes('enfant')) return 'kids';
+    return 'classique';
+  }
+
   function getNiveauCategory(niveau) {
-    const n = (niveau || '').toLowerCase();
+    var n = (niveau || '').toLowerCase();
     if (n.includes('avance') || n.includes('avanc') || n.includes('expert')) return 'pro';
     return 'debutant';
   }
 
-  function isManga(discipline) {
-    return (discipline || '').toLowerCase().includes('manga');
-  }
-
   function scoreHybrid(scoreIA, nbVotes) {
-    const ia   = scoreIA * 0.8;
-    const vote = (Math.log(nbVotes + 1) / Math.log(MAX_VOTES_REF + 1)) * 20;
+    var ia   = scoreIA * 0.8;
+    var vote = (Math.log(nbVotes + 1) / Math.log(MAX_VOTES_REF + 1)) * 20;
     return Math.min(100, Math.round((ia + vote) * 10) / 10);
   }
 
-  let allArtworks    = [];
-  let currentFiltered = [];
-  let currentPage    = PAGE_SIZE;
-  let activeFilters  = { primary: 'all', secondary: 'all', tertiary: 'all' };
-  let pendingVote    = null;
+  var allArtworks     = [];
+  var currentFiltered = [];
+  var currentPage     = PAGE_SIZE;
+  var activeFilters   = { primary: 'all', secondary: 'all', tertiary: 'all' };
+  var pendingVote     = null;
 
-  const LS_EMAIL  = 'scolartist_email';
-  const LS_PSEUDO = 'scolartist_pseudo';
-  const LS_VOTED  = 'scolartist_voted';
+  var LS_EMAIL  = 'scolartist_email';
+  var LS_PSEUDO = 'scolartist_pseudo';
+  var LS_VOTED  = 'scolartist_voted';
 
-  function getVotedList() { try { return JSON.parse(localStorage.getItem(LS_VOTED) || '[]'); } catch { return []; } }
+  function getVotedList() { try { return JSON.parse(localStorage.getItem(LS_VOTED) || '[]'); } catch(e) { return []; } }
   function saveVoted(l) { localStorage.setItem(LS_VOTED, JSON.stringify(l)); }
   function hasVoted(id) { return getVotedList().includes(id); }
-  function addVoted(id) { const l = getVotedList(); if (!l.includes(id)) { l.push(id); saveVoted(l); } }
-  function removeVoted(id) { saveVoted(getVotedList().filter(v => v !== id)); }
+  function addVoted(id) { var l = getVotedList(); if (!l.includes(id)) { l.push(id); saveVoted(l); } }
+  function removeVoted(id) { saveVoted(getVotedList().filter(function(v) { return v !== id; })); }
 
   async function loadGallery() {
     try {
-      const res = await fetch(GALLERY_JSON_URL);
+      var res = await fetch(GALLERY_JSON_URL);
       if (!res.ok) throw new Error('HTTP ' + res.status);
-      const data = await res.json();
+      var data = await res.json();
       renderGallery(data);
-    } catch (err) {
+    } catch(err) {
       document.getElementById('gallery').innerHTML =
         '<div class="error-state"><div class="error-icon">+</div><div class="error-text">Impossible de charger la galerie<br>' + err.message + '</div></div>';
     }
@@ -508,37 +427,32 @@
 
   function renderAgeGauge(artworks) {
     if (!artworks.length) return;
-    const counts = { enfants: 0, ados: 0, adultes: 0 };
+    var counts = { enfants: 0, ados: 0, adultes: 0 };
     artworks.forEach(function(a) {
-      const age = (a.age || '').trim();
+      var age = (a.age || '').trim();
       if (AGE_GROUPS.enfants.includes(age)) counts.enfants++;
       else if (AGE_GROUPS.ados.includes(age)) counts.ados++;
       else counts.adultes++;
     });
-    const total = artworks.length;
-    const gauge = document.getElementById('age-gauge');
+    var total = artworks.length;
+    var gauge = document.getElementById('age-gauge');
     gauge.style.display = 'flex';
     ['enfants', 'ados', 'adultes'].forEach(function(g) {
-      const pct = total > 0 ? Math.round((counts[g] / total) * 100) : 0;
+      var pct = total > 0 ? Math.round((counts[g] / total) * 100) : 0;
       document.getElementById('count-' + g).textContent = counts[g];
       document.getElementById('pct-' + g).textContent = pct + '%';
-      setTimeout(function() {
-        document.getElementById('bar-' + g).style.width = pct + '%';
-      }, 300);
+      setTimeout(function() { document.getElementById('bar-' + g).style.width = pct + '%'; }, 300);
     });
   }
 
-  const AGE_BY_CATEGORY = {
+  var AGE_BY_CATEGORY = {
     debutant: ['enfants', 'ados', 'adultes'],
     pro:      ['enfants', 'ados', 'adultes'],
-    manga:    ['enfants', 'ados', 'adultes']
+    manga:    ['enfants', 'ados', 'adultes'],
+    kids:     ['enfants', 'ados', 'adultes']
   };
 
-  const AGE_LABELS = {
-    enfants: 'Enfants',
-    ados:    'Ados',
-    adultes: 'Adultes'
-  };
+  var AGE_LABELS = { enfants: 'Enfants', ados: 'Ados', adultes: 'Adultes' };
 
   function filterPrimary(value, btn) {
     activeFilters.primary = value;
@@ -547,12 +461,12 @@
     document.querySelectorAll('.filters-primary .filter-btn').forEach(function(b) { b.classList.remove('active'); });
     btn.classList.add('active');
 
-    const sec = document.getElementById('filters-secondary');
-    const ter = document.getElementById('filters-tertiary');
+    var sec = document.getElementById('filters-secondary');
+    var ter = document.getElementById('filters-tertiary');
     ter.classList.remove('visible');
 
     if (value !== 'all' && AGE_BY_CATEGORY[value]) {
-      const groups = AGE_BY_CATEGORY[value];
+      var groups = AGE_BY_CATEGORY[value];
       sec.innerHTML = '<span class="filter-label">Groupe :</span>' +
         '<button class="filter-btn active" onclick="filterSecondary(\'all\', this)">Tous ages</button>' +
         groups.map(function(g) { return '<button class="filter-btn" onclick="filterSecondary(\'' + g + '\', this)">' + AGE_LABELS[g] + '</button>'; }).join('');
@@ -569,9 +483,8 @@
     document.querySelectorAll('.filters-secondary .filter-btn').forEach(function(b) { b.classList.remove('active'); });
     btn.classList.add('active');
 
-    const ter = document.getElementById('filters-tertiary');
-    const ages = AGE_GROUPS[value];
-
+    var ter = document.getElementById('filters-tertiary');
+    var ages = AGE_GROUPS[value];
     if (value !== 'all' && value !== 'adultes' && ages && ages.length > 0) {
       ter.innerHTML = '<span class="filter-label">Age :</span>' +
         '<button class="filter-btn active" onclick="filterTertiary(\'all\', this)">Tous</button>' +
@@ -592,12 +505,14 @@
 
   function applyFilters() {
     var f = allArtworks;
-    var primary = activeFilters.primary;
+    var primary   = activeFilters.primary;
     var secondary = activeFilters.secondary;
-    var tertiary = activeFilters.tertiary;
+    var tertiary  = activeFilters.tertiary;
 
     if (primary === 'manga') {
-      f = f.filter(function(a) { return isManga(a.discipline); });
+      f = f.filter(function(a) { return getDiscipline(a.discipline) === 'manga'; });
+    } else if (primary === 'kids') {
+      f = f.filter(function(a) { return getDiscipline(a.discipline) === 'kids'; });
     } else if (primary !== 'all') {
       f = f.filter(function(a) { return getNiveauCategory(a.niveau) === primary; });
     }
@@ -605,7 +520,6 @@
     if (secondary !== 'all' && AGE_GROUPS[secondary]) {
       f = f.filter(function(a) { return AGE_GROUPS[secondary].includes(a.age); });
     }
-
     if (tertiary !== 'all') {
       f = f.filter(function(a) { return a.age === tertiary; });
     }
@@ -621,7 +535,7 @@
   }
 
   function renderCards(artworks) {
-    var gallery = document.getElementById('gallery');
+    var gallery  = document.getElementById('gallery');
     var votedList = getVotedList();
     var svgHeart = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>';
 
@@ -639,7 +553,16 @@
       var isVoted   = votedList.includes(id);
       var nbVotes   = a.votes || 0;
       var score     = a.score;
-      var manga     = isManga(a.discipline);
+      var disc      = getDiscipline(a.discipline);
+
+      var discBadgeHtml = '';
+      if (disc === 'manga') discBadgeHtml = '<div class="disc-badge manga">Manga</div>';
+      else if (disc === 'kids') discBadgeHtml = '<div class="disc-badge kids">Kids</div>';
+
+      var gradeTag = a.grade ? '<span class="tag grade-tag">' + a.grade + '</span>' : '';
+      var discTag  = disc === 'manga' ? '<span class="tag manga-tag">Manga</span>'
+                   : disc === 'kids'  ? '<span class="tag kids-tag">Kids</span>'
+                   : '';
 
       var imageHtml = a.url_image
         ? '<img class="card-image" src="' + a.url_image + '" alt="Oeuvre de ' + a.prenom + '" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">'
@@ -650,14 +573,15 @@
       return '<article class="card' + (isTop1 ? ' top1' : '') + '" style="' + delay + '">' +
         imageHtml + placeholderHtml +
         '<div class="rank-badge ' + rankClass + '">' + rankLabel + '</div>' +
-        (manga ? '<div class="manga-badge">Manga</div>' : '') +
+        discBadgeHtml +
         '<div class="score-overlay"><div class="score-num" id="score-hybrid-' + id + '">' + score + '</div><div class="score-label">Score IA</div></div>' +
         '<div class="card-body"><div>' +
         '<div class="card-meta"><span class="artist-name">' + a.prenom + '</span><span class="challenge-day">J · ' + a.challenge_id + '</span></div>' +
         '<div class="card-tags">' +
         '<span class="tag niveau">' + (a.niveau || 'gratuit') + '</span>' +
+        gradeTag +
         (a.age ? '<span class="tag age">' + a.age + '</span>' : '') +
-        (manga ? '<span class="tag manga-tag">Manga</span>' : '') +
+        discTag +
         '</div>' +
         '<div class="card-theme">' + a.titre + '</div>' +
         '<div class="vote-section">' +
@@ -670,7 +594,7 @@
 
     var remaining = currentFiltered.length - currentPage;
     var voirPlus = remaining > 0
-      ? '<div class="voir-plus-wrap"><button class="voir-plus-btn" onclick="loadMore()">Voir plus</button><span class="voir-plus-count">+ ' + remaining + ' œuvre' + (remaining > 1 ? 's' : '') + '</span></div>'
+      ? '<div class="voir-plus-wrap"><button class="voir-plus-btn" onclick="loadMore()">Voir plus</button><span class="voir-plus-count">+ ' + remaining + ' \u0153uvre' + (remaining > 1 ? 's' : '') + '</span></div>'
       : '';
 
     gallery.innerHTML = cards + voirPlus;
@@ -680,7 +604,6 @@
     var countEl = document.getElementById('votes-' + id);
     var scoreEl = document.getElementById('score-hybrid-' + id);
     var isVoted = hasVoted(id);
-
     if (isVoted) {
       submitVoteDirect({ id: id, action: 'remove', btn: btn, countEl: countEl, scoreEl: scoreEl, scoreIA: scoreIA });
       return;
@@ -720,11 +643,16 @@
     localStorage.setItem(LS_EMAIL, email);
     if (pseudo) localStorage.setItem(LS_PSEUDO, pseudo);
     closeModal();
-    if (pendingVote) { submitVoteDirect(Object.assign({}, pendingVote, { email: email, pseudo: pseudo })); pendingVote = null; }
+    if (pendingVote) {
+      var opts = Object.assign({}, pendingVote, { email: email, pseudo: pseudo });
+      submitVoteDirect(opts);
+      pendingVote = null;
+    }
   }
 
   async function submitVoteDirect(opts) {
-    var id = opts.id, action = opts.action, btn = opts.btn, countEl = opts.countEl, scoreEl = opts.scoreEl, scoreIA = opts.scoreIA, email = opts.email, pseudo = opts.pseudo;
+    var id = opts.id, action = opts.action, btn = opts.btn, countEl = opts.countEl,
+        scoreEl = opts.scoreEl, scoreIA = opts.scoreIA, email = opts.email, pseudo = opts.pseudo;
     btn.classList.add('loading');
     var cur = parseInt(countEl.textContent) || 0;
     var nv  = action === 'add' ? cur + 1 : Math.max(0, cur - 1);
@@ -733,7 +661,6 @@
     else { btn.classList.remove('voted'); btn.innerHTML = btn.innerHTML.replace('Vote', 'Voter'); removeVoted(id); }
 
     countEl.textContent = nv + ' vote' + (nv !== 1 ? 's' : '');
-
     var sv = document.getElementById('stat-votes');
     sv.textContent = action === 'add' ? (parseInt(sv.textContent) || 0) + 1 : Math.max(0, (parseInt(sv.textContent) || 0) - 1);
 
@@ -746,7 +673,7 @@
       var data = await res.json();
       if (data.ok) { showToast(action === 'add' ? 'Vote enregistre !' : 'Vote retire'); }
       else { rollback(opts, cur); showToast(data.message || 'Erreur vote'); }
-    } catch (e) {
+    } catch(e) {
       rollback(opts, cur);
       showToast('Connexion impossible');
     } finally { btn.classList.remove('loading'); }
