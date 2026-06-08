@@ -196,8 +196,7 @@
   <div class="filters-primary" id="filters-primary">
     <span class="filter-label">Catégorie :</span>
     <button class="filter-btn active" onclick="filterPrimary('all',this)">Tous</button>
-    <button class="filter-btn" onclick="filterPrimary('debutant',this)">Débutants</button>
-    <button class="filter-btn" onclick="filterPrimary('pro',this)">Pro</button>
+    <button class="filter-btn" onclick="filterPrimary('classique',this)">Classique</button>
     <button class="filter-btn manga-btn" onclick="filterPrimary('manga',this)">Manga</button>
     <button class="filter-btn kids-btn" onclick="filterPrimary('kids',this)">Kids</button>
   </div>
@@ -241,7 +240,15 @@
   var AGE_GROUPS = { enfants:['3-5 ans','6-8 ans','9-12 ans'], ados:['13-16 ans','17-19 ans'], adultes:['Adulte','19-99 ans'] };
 
   function getDiscipline(d) { var s=(d||'').toLowerCase(); if(s.includes('manga')) return 'manga'; if(s.includes('kids')||s.includes('enfant')) return 'kids'; return 'classique'; }
-  function getNiveauCategory(n) { var s=(n||'').toLowerCase(); if(s.includes('avance')||s.includes('avanc')||s.includes('expert')) return 'pro'; return 'debutant'; }
+
+  // CORRECTION 3 — numéro de semaine ISO correct
+  var getISOWeek = function(d) {
+    var date = new Date(d);
+    date.setHours(0, 0, 0, 0);
+    date.setDate(date.getDate() + 3 - (date.getDay() + 6) % 7);
+    var week1 = new Date(date.getFullYear(), 0, 4);
+    return 1 + Math.round(((date - week1) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
+  };
 
   var allArtworks=[],currentFiltered=[],currentPage=PAGE_SIZE;
   var activeFilters={primary:'all',secondary:'all',tertiary:'all'};
@@ -267,7 +274,19 @@
 
   function renderGallery(data){
     allArtworks=data.artworks||[];
-    document.getElementById('header-meta').textContent='Day Drawing Challenge · Galerie publique · Semaine '+data.numero_semaine;
+
+    // CORRECTION 2 — filtre consenties avec cas '1' (string)
+    var consenties = (data.participations||[]).filter(function(i) {
+      var c = i.json ? i.json['Consentement'] : undefined;
+      return c === true || c === 'TRUE' || c === 'true' ||
+             c === 'vrai' || c === 'Vrai' || c === 'VRAI' ||
+             c === 1 || c === '1';
+    });
+
+    var now = new Date();
+    var numeroSemaine = getISOWeek(now);
+
+    document.getElementById('header-meta').textContent='Day Drawing Challenge · Galerie publique · Semaine '+numeroSemaine;
     document.getElementById('week-badge').textContent=data.semaine;
     document.getElementById('stat-soumissions').textContent=data.total_soumissions;
     document.getElementById('stat-selectionnes').textContent=allArtworks.length;
@@ -295,7 +314,12 @@
     });
   }
 
-  var AGE_BY_CAT={debutant:['enfants','ados','adultes'],pro:['enfants','ados','adultes'],manga:['enfants','ados','adultes'],kids:['enfants','ados','adultes']};
+  // CORRECTION 4 — AGE_BY_CAT avec classique au lieu de debutant/pro
+  var AGE_BY_CAT = {
+    classique: ['enfants','ados','adultes'],
+    manga: ['enfants','ados','adultes'],
+    kids: ['enfants','ados','adultes']
+  };
   var AGE_LABELS={enfants:'Enfants',ados:'Ados',adultes:'Adultes'};
 
   function filterPrimary(value,btn){
@@ -336,11 +360,12 @@
     applyFilters();
   }
 
+  // CORRECTION 4 — applyFilters avec classique
   function applyFilters(){
     var f=allArtworks;
     if(activeFilters.primary==='manga') f=f.filter(function(a){return getDiscipline(a.discipline)==='manga';});
     else if(activeFilters.primary==='kids') f=f.filter(function(a){return getDiscipline(a.discipline)==='kids';});
-    else if(activeFilters.primary!=='all') f=f.filter(function(a){return getNiveauCategory(a.niveau)===activeFilters.primary;});
+    else if(activeFilters.primary==='classique') f=f.filter(function(a){return getDiscipline(a.discipline)==='classique';});
     if(activeFilters.secondary!=='all'&&AGE_GROUPS[activeFilters.secondary])
       f=f.filter(function(a){return AGE_GROUPS[activeFilters.secondary].includes(a.age);});
     if(activeFilters.tertiary!=='all') f=f.filter(function(a){return a.age===activeFilters.tertiary;});
