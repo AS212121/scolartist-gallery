@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Scolartist – AR Drawing & 3D Viewer Prototype</title>
+
+<!-- Google Model-Viewer pour la lecture 3D GLB/GLTF -->
+<script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js"></script>
+
+<style>
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+html, body { height:100%; overflow:hidden; background:#0a0a0a; font-family: -apple-system, 'Segoe UI', Roboto, sans-serif; touch-action:none; }
+#stage { position:fixed; inset:0; overflow:hidden; }
+#camera { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+
+#overlayWrap {
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform: translate(-50%,-50%) scale(1) rotate(0deg);
+  touch-action:none;
+  max-width:none;
+  width: 320px;
+  height: 480px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* En mode 3D, le modèle a besoin de ses propres gestes tactiles natifs
+   (orbite / pan / zoom gérés par model-viewer). On laisse le navigateur
+   les traiter normalement au lieu de tout bloquer au niveau du wrapper. */
+#overlayWrap.mode-3d { touch-action: auto; }
+
+/* Styles communs pour overlay 2D et 3D */
+#overlayImg, model-viewer {
+  display:none;
+  width: 100%;
+  height: 100%;
+  max-width:none;
+  filter: none;
+  opacity: 0.6;
+  user-select:none;
+  -webkit-user-drag:none;
+}
+
+#overlayImg.active, model-viewer.active {
+  display: block;
+}
+
+#overlayImg.edge, model-viewer.edge {
+  filter: grayscale(1) contrast(1.4);
+  mix-blend-mode: multiply;
+}
+model-viewer.edge { mix-blend-mode: normal; } /* le blend multiply ne s'applique pas bien au canvas WebGL */
+
+/* Placeholder */
+#placeholder { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; color:#fff; background:rgba(0,0,0,0.55); text-align:center; padding:32px; z-index: 10; }
+#placeholder p { opacity:0.75; max-width:280px; line-height:1.4; font-size:14px; }
+.btn-primary { background:#6c5ce7; color:#fff; border:none; padding:14px 28px; border-radius:30px; font-size:15px; font-weight:600; cursor:pointer; }
+
+/* Topbar */
+#topbar { position:fixed; top:0; left:0; right:0; z-index:20; display:flex; justify-content:space-between; align-items:center; padding: max(14px, env(safe-area-inset-top)) 14px 14px; background:linear-gradient(to bottom, rgba(0,0,0,0.65), transparent); transition: opacity 0.25s ease; }
+#topbar h1 { color:#fff; font-size:14px; font-weight:600; letter-spacing:0.3px; }
+#topbar h1 span { color:#a29bfe; }
+.icon-btn { width:40px; height:40px; border-radius:50%; border:none; background:rgba(255,255,255,0.12); color:#fff; font-size:18px; display:flex; align-items:center; justify-content:center; cursor:pointer; backdrop-filter: blur(6px); }
+
+/* Controls */
+#controls { position:fixed; left:0; right:0; bottom:0; z-index:20; padding: 14px 18px max(18px, env(safe-area-inset-bottom)); background:linear-gradient(to top, rgba(0,0,0,0.75), transparent); display:flex; flex-direction:column; gap:14px; transition: transform 0.25s ease, opacity 0.25s ease; }
+#controls.hidden { transform: translateY(120%); opacity:0; pointer-events:none; }
+.slider-row { display:flex; align-items:center; gap:10px; color:#fff; font-size:12px; }
+.slider-row span:first-child { width:38px; opacity:0.7; }
+input[type=range] { flex:1; -webkit-appearance:none; height:4px; border-radius:2px; background:rgba(255,255,255,0.25); outline:none; }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:20px; height:20px; border-radius:50%; background:#6c5ce7; border:2px solid #fff; cursor:pointer; }
+.action-row { display:flex; justify-content:center; align-items:center; gap:22px; }
+.action-btn { display:flex; flex-direction:column; align-items:center; gap:5px; background:none; border:none; color:#fff; font-size:10px; cursor:pointer; }
+.action-btn .circle { width:52px; height:52px; border-radius:50%; background:rgba(255,255,255,0.14); display:flex; align-items:center; justify-content:center; font-size:20px; backdrop-filter: blur(6px); }
+.action-btn.lock .circle.active { background:#e17055; }
+.action-btn.mirror .circle.active { background:#00b894; }
+.action-btn.edge .circle.active { background:#0984e3; }
+#fileInput { display:none; }
+#hint { position:fixed; top:70px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.6); color:#fff; font-size:12px; padding:7px 14px; border-radius:16px; z-index:20; opacity:0; transition:opacity 0.3s ease; pointer-events:none; text-align:center; white-space:nowrap; max-width:85vw; white-space:normal; text-align:center; }
+#hint.show { opacity:1; }
+#camError { position:fixed; inset:0; display:none; z-index:30; background:#111; color:#fff; align-items:center; justify-content:center; flex-direction:column; gap:12px; padding:32px; text-align:center; }
+#camError.show { display:flex; }
+#camError p { opacity:0.7; font-size:13px; max-width:280px; line-height:1.5; }
+</style>
+</head>
+<body>
+
+<div id="stage">
+  <video id="camera" autoplay playsinline muted></video>
+
+  <div id="overlayWrap">
+    <!-- Overlay Image 2D -->
+    <img id="overlayImg" alt="référence">
+
+    <!-- Overlay Modèle 3D AR (model-viewer gère lui-même orbite/pan/zoom) -->
+    <model-viewer
+      id="overlay3D"
+      camera-controls
+      touch-action="pan-y"
+      shadow-intensity="0.5"
+      interaction-prompt="none"
+      exposure="1.2">
+    </model-viewer>
+  </div>
+
+  <div id="placeholder">
+    <div style="font-size:38px;">🎨</div>
+    <p><strong>Superpose une image 2D ou un modèle 3D (.glb)</strong><br>sur ta caméra pour décalquer ou étudier l'anatomie à 360°.</p>
+    <button class="btn-primary" id="pickBtn">Choisir un fichier (2D / 3D)</button>
+    <div style="display:flex; gap:8px; width:100%; max-width:320px; margin-top:4px;">
+      <input type="text" id="urlInput" placeholder="ou colle une URL (https://scolartist.fr/...)"
+        style="flex:1; padding:10px 12px; border-radius:20px; border:none; font-size:13px; background:rgba(255,255,255,0.12); color:#fff;">
+      <button class="icon-btn" id="urlLoadBtn" title="Charger depuis l'URL">➜</button>
+    </div>
+  </div>
+</div>
+
+<div id="camError">
+  <div style="font-size:34px;">📷</div>
+  <p><strong>Caméra inaccessible ici</strong><br> Ouvre ce fichier directement sur ton téléphone (en HTTPS) pour activer la vidéo.</p>
+</div>
+
+<!-- On autorise à la fois les images et les modèles 3D (.glb, .gltf) -->
+<input type="file" id="fileInput" accept="image/*,.glb,.gltf">
+
+<div id="topbar">
+  <button class="icon-btn" id="backBtn" title="Retour à la galerie">←</button>
+  <h1 id="pageTitle">Scolartist <span>AR Trace & 3D</span></h1>
+  <div style="display:flex; gap:8px;">
+    <button class="icon-btn" id="urlSwapBtn" title="Charger depuis une URL">🔗</button>
+    <button class="icon-btn" id="swapBtn" title="Changer de fichier">🖼️</button>
+  </div>
+</div>
+
+<div id="hint">Glisse pour déplacer · pince pour zoomer/tourner</div>
+
+<div id="controls" class="hidden">
+  <div class="slider-row">
+    <span>Opac.</span>
+    <input type="range" id="opacitySlider" min="5" max="95" value="60">
+  </div>
+  <div class="action-row">
+    <button class="action-btn edge" id="edgeBtn">
+      <span class="circle">✏️</span> Contours
+    </button>
+    <button class="action-btn mirror" id="mirrorBtn">
+      <span class="circle">⇋</span> Miroir
+    </button>
+    <button class="action-btn lock" id="lockBtn">
+      <span class="circle">🔓</span> Verrouiller
+    </button>
+  </div>
+</div>
+
+<script>
+(function(){
+  const video = document.getElementById('camera');
+  const overlayWrap = document.getElementById('overlayWrap');
+  const overlayImg = document.getElementById('overlayImg');
+  const overlay3D = document.getElementById('overlay3D');
+  const placeholder = document.getElementById('placeholder');
+  const controls = document.getElementById('controls');
+  const opacitySlider = document.getElementById('opacitySlider');
+  const lockBtn = document.getElementById('lockBtn');
+  const mirrorBtn = document.getElementById('mirrorBtn');
+  const edgeBtn = document.getElementById('edgeBtn');
+  const swapBtn = document.getElementById('swapBtn');
+  const pickBtn = document.getElementById('pickBtn');
+  const fileInput = document.getElementById('fileInput');
+  const hint = document.getElementById('hint');
+  const camError = document.getElementById('camError');
+  const pageTitle = document.getElementById('pageTitle');
+  const backBtn = document.getElementById('backBtn');
+
+  backBtn.addEventListener('click', ()=>{
+    // Retour à la galerie si on y accède depuis un lien, sinon retour navigateur
+    if (document.referrer && document.referrer.includes('ar-gallery')) {
+      history.back();
+    } else {
+      location.href = 'ar-gallery.html';
+    }
+  });
+
+  let activeMode = null; // '2d' ou '3d'
+
+  let state = {
+    x:0, y:0, scale:1, rotate:0, mirrored:false, locked:false
+  };
+
+  let wakeLock = null;
+  async function requestWakeLock(){
+    try{ if('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); }catch(e){}
+  }
+
+  function applyTransform(){
+    overlayWrap.style.transform = `translate(-50%,-50%) translate(${state.x}px, ${state.y}px) scale(${state.scale * (state.mirrored?-1:1)}, ${state.scale}) rotate(${state.rotate}deg)`;
+  }
+
+  function showHint(msg){
+    if(msg) hint.textContent = msg;
+    hint.classList.add('show');
+    setTimeout(()=>hint.classList.remove('show'), msg ? 4200 : 2400);
+  }
+
+  // --- camera ---
+  async function startCamera(){
+    try{
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio:false });
+      video.srcObject = stream;
+    }catch(err){
+      camError.classList.add('show');
+    }
+  }
+  startCamera();
+
+  // --- file/URL loading (Support 2D & 3D) ---
+  // `source` peut être un objet File (depuis le picker) ou une chaîne URL (https://...)
+  function loadSource(source){
+    if(!source) return;
+    let url, name;
+    if(typeof source === 'string'){
+      url = source;
+      name = source.split('?')[0]; // ignore les query params pour détecter l'extension
+    } else {
+      url = URL.createObjectURL(source);
+      name = source.name;
+    }
+    const ext = name.split('.').pop().toLowerCase();
+
+    if(ext === 'glb' || ext === 'gltf'){
+      // Mode 3D : on laisse model-viewer gérer ses propres gestes
+      // (orbite 1 doigt, pan 2 doigts, zoom pincer) plutôt que le
+      // système de drag/pinch du wrapper, pour éviter tout conflit.
+      activeMode = '3d';
+      overlayWrap.classList.add('mode-3d');
+      overlayImg.classList.remove('active');
+      overlay3D.src = url;
+      overlay3D.classList.add('active');
+      overlay3D.style.opacity = (opacitySlider.value / 100).toFixed(2);
+      overlay3D.setAttribute('camera-controls', '');
+
+      placeholder.style.display = 'none';
+      controls.classList.remove('hidden');
+      showHint("Glisse le modèle pour l'orbiter, pince pour zoomer. Verrouille une fois la pose trouvée.");
+    } else {
+      // Mode 2D classique : le wrapper gère drag/pinch/rotate lui-même
+      activeMode = '2d';
+      overlayWrap.classList.remove('mode-3d');
+      overlay3D.classList.remove('active');
+      overlayImg.src = url;
+      overlayImg.classList.add('active');
+      overlayImg.style.opacity = (opacitySlider.value / 100).toFixed(2);
+
+      overlayImg.onload = () => {
+        placeholder.style.display = 'none';
+        controls.classList.remove('hidden');
+        showHint();
+      };
+    }
+    requestWakeLock();
+  }
+
+  pickBtn.addEventListener('click', ()=> fileInput.click());
+  swapBtn.addEventListener('click', ()=> fileInput.click());
+  fileInput.addEventListener('change', e => loadSource(e.target.files[0]));
+
+  const urlInput = document.getElementById('urlInput');
+  const urlLoadBtn = document.getElementById('urlLoadBtn');
+  const urlSwapBtn = document.getElementById('urlSwapBtn');
+
+  function loadFromUrlField(){
+    const val = urlInput.value.trim();
+    if(val) loadSource(val);
+  }
+  urlLoadBtn.addEventListener('click', loadFromUrlField);
+  urlInput.addEventListener('keydown', e => { if(e.key === 'Enter') loadFromUrlField(); });
+
+  urlSwapBtn.addEventListener('click', ()=>{
+    const val = prompt("URL de l'image ou du modèle .glb (ex: https://scolartist.fr/library/modele.glb)");
+    if(val) loadSource(val.trim());
+  });
+
+  // --- Opacité ---
+  opacitySlider.addEventListener('input', e=>{
+    const val = (e.target.value/100).toFixed(2);
+    overlayImg.style.opacity = val;
+    overlay3D.style.opacity = val;
+  });
+
+  // --- Mode Contours / Filtre ---
+  let edgeOn = false;
+  edgeBtn.addEventListener('click', ()=>{
+    edgeOn = !edgeOn;
+    overlayImg.classList.toggle('edge', edgeOn);
+    overlay3D.classList.toggle('edge', edgeOn);
+    edgeBtn.querySelector('.circle').classList.toggle('active', edgeOn);
+  });
+
+  // --- Miroir (s'applique au wrapper entier, fonctionne pour 2D et 3D) ---
+  mirrorBtn.addEventListener('click', ()=>{
+    state.mirrored = !state.mirrored;
+    mirrorBtn.querySelector('.circle').classList.toggle('active', state.mirrored);
+    applyTransform();
+  });
+
+  // --- Verrouillage ---
+  // 2D : fige totalement la position (plus de drag possible).
+  // 3D : coupe camera-controls pour figer l'orbite du modèle, tout en
+  //      gardant la possibilité de repositionner/redimensionner le
+  //      cadre entier (comme en 2D) une fois la pose choisie.
+  lockBtn.addEventListener('click', ()=>{
+    state.locked = !state.locked;
+    lockBtn.querySelector('.circle').classList.toggle('active', state.locked);
+    lockBtn.querySelector('.circle').textContent = state.locked ? '🔒' : '🔓';
+    lockBtn.lastChild.textContent = state.locked ? ' Verrouillé' : ' Verrouiller';
+    document.getElementById('topbar').style.opacity = state.locked ? '0.35' : '1';
+
+    if(activeMode === '3d'){
+      if(state.locked){
+        overlay3D.removeAttribute('camera-controls');
+        overlayWrap.classList.remove('mode-3d'); // rend la main au wrapper pour repositionner le cadre figé
+      } else {
+        overlay3D.setAttribute('camera-controls', '');
+        overlayWrap.classList.add('mode-3d'); // rend la main à model-viewer pour orbiter à nouveau
+      }
+    }
+  });
+
+  // --- Gestes: drag + pinch (rotate & scale) sur le wrapper ---
+  // Actifs en mode 2D toujours, et en mode 3D seulement une fois verrouillé
+  // (sinon on laisse model-viewer gérer ses propres gestes tactiles).
+  let pointers = new Map();
+  let gestureStart = null;
+
+  function wrapperGesturesActive(){
+    return activeMode === '2d' || (activeMode === '3d' && state.locked);
+  }
+
+  overlayWrap.addEventListener('pointerdown', e=>{
+    if(!wrapperGesturesActive()) return;
+    overlayWrap.setPointerCapture(e.pointerId);
+    pointers.set(e.pointerId, {x:e.clientX, y:e.clientY});
+    if(pointers.size === 1){
+      gestureStart = { type:'drag', startX:e.clientX, startY:e.clientY, origX:state.x, origY:state.y };
+    } else if(pointers.size === 2){
+      const pts = [...pointers.values()];
+      const dx = pts[0].x - pts[1].x, dy = pts[0].y - pts[1].y;
+      gestureStart = {
+        type:'pinch',
+        dist: Math.hypot(dx,dy),
+        angle: Math.atan2(dy,dx) * 180/Math.PI,
+        origScale: state.scale,
+        origRotate: state.rotate
+      };
+    }
+  });
+
+  overlayWrap.addEventListener('pointermove', e=>{
+    if(!wrapperGesturesActive() || !pointers.has(e.pointerId)) return;
+    pointers.set(e.pointerId, {x:e.clientX, y:e.clientY});
+
+    if(gestureStart && gestureStart.type==='drag' && pointers.size===1){
+      state.x = gestureStart.origX + (e.clientX - gestureStart.startX);
+      state.y = gestureStart.origY + (e.clientY - gestureStart.startY);
+      applyTransform();
+    } else if(gestureStart && gestureStart.type==='pinch' && pointers.size===2){
+      const pts = [...pointers.values()];
+      const dx = pts[0].x - pts[1].x, dy = pts[0].y - pts[1].y;
+      const dist = Math.hypot(dx,dy);
+      const angle = Math.atan2(dy,dx) * 180/Math.PI;
+      state.scale = Math.max(0.1, gestureStart.origScale * (dist / gestureStart.dist));
+      state.rotate = gestureStart.origRotate + (angle - gestureStart.angle);
+      applyTransform();
+    }
+  });
+
+  function endPointer(e){
+    pointers.delete(e.pointerId);
+    if(pointers.size === 1){
+      const [p] = pointers.values();
+      gestureStart = { type:'drag', startX:p.x, startY:p.y, origX:state.x, origY:state.y };
+    } else if(pointers.size === 0){
+      gestureStart = null;
+    }
+  }
+  overlayWrap.addEventListener('pointerup', endPointer);
+  overlayWrap.addEventListener('pointercancel', endPointer);
+
+  applyTransform();
+
+  // --- Chargement automatique depuis la galerie (?src=...&titre=...) ---
+  const params = new URLSearchParams(location.search);
+  const srcParam = params.get('src');
+  const titreParam = params.get('titre');
+  if (titreParam) {
+    pageTitle.innerHTML = `Scolartist <span>${titreParam}</span>`;
+  }
+  if (srcParam) {
+    loadSource(decodeURIComponent(srcParam));
+  }
+})();
+</script>
+</body>
+</html>

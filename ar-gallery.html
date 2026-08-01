@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scolartist — Galerie AR</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --bg: #f3ede0;
+  --bg-card: #fbf8f0;
+  --bg-card-hover: #ffffff;
+  --border: #e0d6bf;
+  --gold: #a9812f;
+  --gold-soft: #8a6a24;
+  --text: #2a241a;
+  --text-dim: #8a7f68;
+  --green: #4f8a5f;
+  --terracotta: #b45c37;
+}
+*{ margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html,body{ background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; }
+body{ min-height:100vh; padding-bottom:60px; }
+
+/* ---------- Header ---------- */
+header{
+  display:flex; align-items:center; justify-content:space-between;
+  padding: 22px 28px 18px; flex-wrap:wrap; gap:12px;
+  border-bottom:1px solid var(--border);
+}
+.logo{ font-family:'Cormorant Garamond',serif; font-size:26px; font-weight:600; letter-spacing:0.5px; }
+.logo em{ font-style:italic; color:var(--gold); font-weight:500; }
+.nav-crumbs{
+  font-size:11px; letter-spacing:1.4px; text-transform:uppercase; color:var(--text-dim);
+  display:flex; gap:10px; align-items:center;
+}
+.nav-crumbs .dot{ opacity:0.5; }
+.nav-crumbs a{ color:var(--text-dim); text-decoration:none; }
+.nav-crumbs a:hover{ color:var(--gold-soft); }
+.nav-crumbs .current{ color:var(--gold-soft); }
+
+/* ---------- Intro strip ---------- */
+.intro{ padding: 26px 28px 6px; max-width:720px; }
+.intro h1{
+  font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:500;
+  font-size:28px; color:var(--gold-soft); margin-bottom:8px;
+}
+.intro p{ color:var(--text-dim); font-size:14px; line-height:1.6; }
+
+/* ---------- Filters ---------- */
+.filters{ padding: 22px 28px 4px; display:flex; flex-direction:column; gap:14px; }
+.filter-label{ font-size:11px; letter-spacing:1.4px; text-transform:uppercase; color:var(--text-dim); margin-bottom:2px; }
+.pill-row{ display:flex; gap:8px; flex-wrap:wrap; }
+.pill{
+  border:1px solid var(--border); background:transparent; color:var(--text-dim);
+  padding:8px 16px; border-radius:20px; font-size:12px; letter-spacing:0.6px;
+  text-transform:uppercase; cursor:pointer; transition:all 0.15s ease; font-family:'Inter',sans-serif;
+  white-space:nowrap;
+}
+.pill:hover{ border-color:var(--gold-soft); color:var(--text); }
+.pill.active{ border-color:var(--gold); color:var(--gold); background:rgba(201,162,74,0.08); }
+
+/* ---------- Grid ---------- */
+.grid{
+  padding: 28px 28px 40px;
+  display:grid; grid-template-columns:repeat(auto-fill, minmax(230px,1fr)); gap:18px;
+}
+.empty-state{
+  padding: 60px 28px; text-align:center; color:var(--text-dim);
+  font-family:'Cormorant Garamond',serif; font-style:italic; font-size:20px;
+}
+
+.card{
+  background:var(--bg-card); border:1px solid var(--border); border-radius:10px;
+  overflow:hidden; display:flex; flex-direction:column; transition:border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+  cursor:pointer; box-shadow:0 1px 2px rgba(42,36,26,0.06);
+}
+.card:hover{ border-color:var(--gold); transform:translateY(-2px); background:var(--bg-card-hover); box-shadow:0 8px 20px rgba(42,36,26,0.12); }
+
+.card-media{ position:relative; aspect-ratio:3/4; background:#000; overflow:hidden; }
+.card-media img{ width:100%; height:100%; object-fit:cover; display:block; opacity:0.92; }
+
+.badge-type{
+  position:absolute; top:10px; left:10px; z-index:2;
+  width:34px; height:34px; border-radius:50%;
+  background:rgba(11,11,10,0.75); border:1px solid var(--gold);
+  color:var(--gold); font-size:10px; font-weight:700; letter-spacing:0.5px;
+  display:flex; align-items:center; justify-content:center; backdrop-filter:blur(4px);
+}
+
+.badge-sequence{
+  position:absolute; top:10px; right:10px; z-index:2;
+  background:rgba(11,11,10,0.75); border:1px solid rgba(255,255,255,0.15);
+  color:#f3f1ec; font-size:10px; padding:5px 9px; border-radius:12px;
+  backdrop-filter:blur(4px);
+}
+
+.step-dots{
+  position:absolute; bottom:10px; left:0; right:0; z-index:2;
+  display:flex; justify-content:center; gap:6px;
+}
+.step-dot{
+  width:8px; height:8px; border-radius:50%; background:rgba(255,255,255,0.3);
+  border:none; cursor:pointer; padding:0; transition:background 0.15s ease, transform 0.15s ease;
+}
+.step-dot.active{ background:var(--gold); transform:scale(1.25); }
+
+.card-body{ padding:14px 15px 16px; display:flex; flex-direction:column; gap:9px; }
+.card-title{ font-size:14px; font-weight:600; line-height:1.35; }
+.card-tags{ display:flex; gap:6px; flex-wrap:wrap; }
+.tag{
+  font-size:9.5px; letter-spacing:0.5px; text-transform:uppercase; padding:3px 8px;
+  border-radius:10px; border:1px solid var(--border); color:var(--text-dim);
+}
+.tag.niveau-débutant{ color:var(--green); border-color:rgba(79,138,95,0.4); }
+.tag.niveau-intermédiaire{ color:var(--gold-soft); border-color:rgba(138,106,36,0.35); }
+.tag.niveau-avancé{ color:var(--terracotta); border-color:rgba(180,92,55,0.4); }
+
+.card-cta{
+  margin-top:4px; display:flex; align-items:center; justify-content:space-between;
+  font-size:11px; letter-spacing:0.8px; text-transform:uppercase; color:var(--gold);
+}
+.card-cta span.arrow{ transition:transform 0.15s ease; }
+.card:hover .card-cta span.arrow{ transform:translateX(3px); }
+
+@media (max-width:520px){
+  header{ padding:18px 18px 14px; }
+  .intro, .filters, .grid{ padding-left:18px; padding-right:18px; }
+  .grid{ grid-template-columns:repeat(auto-fill, minmax(150px,1fr)); gap:12px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Scol<em>artist</em></div>
+  <nav class="nav-crumbs">
+    <a href="index.html">Day Drawing Challenge</a>
+    <span class="dot">·</span>
+    <span class="current">Galerie AR</span>
+  </nav>
+</header>
+
+<div class="intro">
+  <h1>Bibliothèque de références AR</h1>
+  <p>Choisis une référence 2D ou un modèle 3D à superposer sur ta caméra pour décalquer, orbiter et étudier les proportions — puis lance-toi dans le Day Drawing Challenge sans filet.</p>
+</div>
+
+<div class="filters">
+  <div>
+    <div class="filter-label">Catégorie</div>
+    <div class="pill-row" id="categoryFilters"></div>
+  </div>
+  <div>
+    <div class="filter-label">Type</div>
+    <div class="pill-row" id="typeFilters">
+      <button class="pill active" data-type="tous">Tous</button>
+      <button class="pill" data-type="2D">2D</button>
+      <button class="pill" data-type="3D">3D</button>
+    </div>
+  </div>
+</div>
+
+<div class="grid" id="grid"></div>
+
+<script>
+// ------------------------------------------------------------------
+// Source des données : pour l'instant un data.json statique à côté
+// de cette page. Plus tard, remplace DATA_URL par l'URL du webhook
+// n8n qui lit directement le Google Sheet "Bibliothèque AR" —
+// aucune autre ligne de ce script n'a besoin de changer.
+// ------------------------------------------------------------------
+const DATA_URL = 'data.json';
+const VIEWER_URL = 'ar-viewer.html';
+
+const grid = document.getElementById('grid');
+const categoryFiltersEl = document.getElementById('categoryFilters');
+const typeFiltersEl = document.getElementById('typeFilters');
+
+let activeCategory = 'Tous';
+let activeType = 'tous';
+let groups = [];
+
+function niveauClass(niveau){
+  return 'niveau-' + (niveau || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+}
+
+function groupBySequence(items){
+  const out = [];
+  const bySeq = {};
+  for(const item of items){
+    if(item.sequence_id){
+      if(!bySeq[item.sequence_id]) bySeq[item.sequence_id] = [];
+      bySeq[item.sequence_id].push(item);
+    } else {
+      out.push({ single: item, steps: [item] });
+    }
+  }
+  for(const seqId in bySeq){
+    const steps = bySeq[seqId].sort((a,b)=> (a.etape||0) - (b.etape||0));
+    out.push({ single: steps[0], steps });
+  }
+  return out;
+}
+
+function cardHTML(group){
+  const first = group.single;
+  const isSeq = group.steps.length > 1;
+  const typeLabel = first.type;
+  const tags = [first.sous_categorie, first.niveau].filter(Boolean);
+
+  return `
+    <div class="card" data-category="${first.categorie_principale}" data-type="${first.type}" data-step="0">
+      <div class="card-media">
+        <div class="badge-type">${typeLabel}</div>
+        ${isSeq ? `<div class="badge-sequence">${group.steps.length} étapes</div>` : ''}
+        <img src="${group.steps[0].url_thumb}" alt="${first.titre}" loading="lazy"
+             onerror="this.style.opacity='0.15'">
+        ${isSeq ? `<div class="step-dots">${group.steps.map((s,i)=>
+            `<button class="step-dot ${i===0?'active':''}" data-idx="${i}" title="Étape ${s.etape}"></button>`
+          ).join('')}</div>` : ''}
+      </div>
+      <div class="card-body">
+        <div class="card-title">${first.titre.replace(/\s*[—-]\s*[ÉEeé]tape.*$/,'')}</div>
+        <div class="card-tags">${tags.map(t=>`<span class="tag ${t===first.niveau?niveauClass(t):''}">${t}</span>`).join('')}</div>
+        <div class="card-cta">
+          <span>Ouvrir en AR</span>
+          <span class="arrow">→</span>
+        </div>
+      </div>
+    </div>`;
+}
+
+function render(){
+  const filtered = groups.filter(g=>{
+    const catOk = activeCategory==='Tous' || g.single.categorie_principale===activeCategory;
+    const typeOk = activeType==='tous' || g.single.type===activeType;
+    return catOk && typeOk;
+  });
+
+  if(filtered.length===0){
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">Aucune référence dans cette sélection pour l'instant.</div>`;
+    return;
+  }
+
+  grid.innerHTML = filtered.map(cardHTML).join('');
+
+  // Étape active par carte (pour les carrousels step-by-step)
+  const cards = grid.querySelectorAll('.card');
+  cards.forEach((cardEl, i)=>{
+    const group = filtered[i];
+
+    cardEl.querySelectorAll('.step-dot').forEach(dot=>{
+      dot.addEventListener('click', e=>{
+        e.stopPropagation();
+        const idx = parseInt(dot.dataset.idx, 10);
+        cardEl.dataset.step = idx;
+        cardEl.querySelectorAll('.step-dot').forEach(d=>d.classList.remove('active'));
+        dot.classList.add('active');
+        cardEl.querySelector('.card-media img').src = group.steps[idx].url_thumb;
+      });
+    });
+
+    cardEl.addEventListener('click', ()=>{
+      const idx = parseInt(cardEl.dataset.step, 10) || 0;
+      const item = group.steps[idx];
+      const url = `${VIEWER_URL}?src=${encodeURIComponent(item.url_fichier)}&titre=${encodeURIComponent(item.titre)}`;
+      location.href = url;
+    });
+  });
+}
+
+function buildCategoryFilters(items){
+  const cats = ['Tous', ...new Set(items.map(i=>i.categorie_principale))];
+  categoryFiltersEl.innerHTML = cats.map(c=>
+    `<button class="pill ${c===activeCategory?'active':''}" data-cat="${c}">${c}</button>`
+  ).join('');
+  categoryFiltersEl.querySelectorAll('.pill').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      activeCategory = btn.dataset.cat;
+      categoryFiltersEl.querySelectorAll('.pill').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      render();
+    });
+  });
+}
+
+typeFiltersEl.querySelectorAll('.pill').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    activeType = btn.dataset.type;
+    typeFiltersEl.querySelectorAll('.pill').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    render();
+  });
+});
+
+fetch(DATA_URL)
+  .then(r=>r.json())
+  .then(items=>{
+    groups = groupBySequence(items);
+    buildCategoryFilters(items);
+    render();
+  })
+  .catch(()=>{
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">Impossible de charger la bibliothèque (data.json introuvable ou invalide).</div>`;
+  });
+</script>
+
+</body>
+</html>
