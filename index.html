@@ -30,6 +30,9 @@
   .logo { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; font-weight: 300; letter-spacing: 0.2em; color: var(--cream); }
   .logo span { color: var(--gold); font-style: italic; }
   .header-meta { font-size: 0.6rem; letter-spacing: 0.15em; color: var(--muted); text-transform: uppercase; }
+  .header-right { display: flex; align-items: center; gap: 0.9rem; }
+  .ar-gallery-link { display: inline-flex; align-items: center; gap: 0.3rem; font-family: 'DM Mono', monospace; font-size: 0.55rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold); text-decoration: none; border: 1px solid var(--border); padding: 0.32rem 0.8rem; border-radius: 50px; transition: all 0.2s; white-space: nowrap; }
+  .ar-gallery-link:hover { border-color: var(--gold); background: rgba(201,168,76,0.08); }
 
   .hero { padding: 3rem 2rem 2rem; display: flex; align-items: flex-end; justify-content: space-between; gap: 2rem; flex-wrap: wrap; }
   .hero-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(2.5rem, 5vw, 4.5rem); font-weight: 300; line-height: 0.95; color: var(--cream); }
@@ -170,7 +173,10 @@
 
 <header>
   <div class="logo">Scol<span>artist</span></div>
-  <div class="header-meta" id="header-meta">Day Drawing Challenge · Galerie publique · Chargement...</div>
+  <div class="header-right">
+    <a href="ar-gallery.html" class="ar-gallery-link">Galerie AR ↗</a>
+    <div class="header-meta" id="header-meta">Day Drawing Challenge · Galerie publique · Chargement...</div>
+  </div>
 </header>
 
 <section class="hero">
