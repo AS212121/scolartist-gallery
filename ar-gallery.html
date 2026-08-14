@@ -2,312 +2,507 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Scolartist — Galerie AR</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Scolartist – AR Drawing & 3D Viewer Prototype</title>
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- Décodeur Meshopt : nécessaire pour charger les .glb compressés avec
+     gltfpack -cc (extension EXT_meshopt_compression), sinon model-viewer
+     télécharge le fichier mais n'affiche rien. Doit être configuré AVANT
+     que le script model-viewer ci-dessous ne s'exécute. -->
+<script>
+  self.ModelViewerElement = self.ModelViewerElement || {};
+  self.ModelViewerElement.meshoptDecoderLocation = 'https://unpkg.com/meshoptimizer@0.22.0/meshopt_decoder.js';
+</script>
+
+<!-- Google Model-Viewer pour la lecture 3D GLB/GLTF -->
+<script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+
+<!-- Conversion des photos HEIC/HEIF (iPhone) en JPEG, car les navigateurs ne les lisent pas nativement -->
+<script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
 
 <style>
-:root{
-  --bg: #f3ede0;
-  --bg-card: #fbf8f0;
-  --bg-card-hover: #ffffff;
-  --border: #e0d6bf;
-  --gold: #a9812f;
-  --gold-soft: #8a6a24;
-  --text: #2a241a;
-  --text-dim: #8a7f68;
-  --green: #4f8a5f;
-  --terracotta: #b45c37;
-}
-*{ margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-html,body{ background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; }
-body{ min-height:100vh; padding-bottom:60px; }
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+html, body { height:100%; overflow:hidden; background:#0a0a0a; font-family: -apple-system, 'Segoe UI', Roboto, sans-serif; touch-action:none; }
+#stage { position:fixed; inset:0; overflow:hidden; }
+#camera { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
 
-/* ---------- Header ---------- */
-header{
-  display:flex; align-items:center; justify-content:space-between;
-  padding: 22px 28px 18px; flex-wrap:wrap; gap:12px;
-  border-bottom:1px solid var(--border);
-}
-.logo{ font-family:'Cormorant Garamond',serif; font-size:26px; font-weight:600; letter-spacing:0.5px; }
-.logo em{ font-style:italic; color:var(--gold); font-weight:500; }
-.nav-crumbs{
-  font-size:11px; letter-spacing:1.4px; text-transform:uppercase; color:var(--text-dim);
-  display:flex; gap:10px; align-items:center;
-}
-.nav-crumbs .dot{ opacity:0.5; }
-.nav-crumbs a{ color:var(--text-dim); text-decoration:none; }
-.nav-crumbs a:hover{ color:var(--gold-soft); }
-.nav-crumbs .current{ color:var(--gold-soft); }
-
-/* ---------- Intro strip ---------- */
-.intro{ padding: 26px 28px 6px; max-width:720px; }
-.intro h1{
-  font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:500;
-  font-size:28px; color:var(--gold-soft); margin-bottom:8px;
-}
-.intro p{ color:var(--text-dim); font-size:14px; line-height:1.6; }
-
-/* ---------- Filters ---------- */
-.filters{ padding: 22px 28px 4px; display:flex; flex-direction:column; gap:14px; }
-.filter-label{ font-size:11px; letter-spacing:1.4px; text-transform:uppercase; color:var(--text-dim); margin-bottom:2px; }
-.pill-row{ display:flex; gap:8px; flex-wrap:wrap; }
-.pill{
-  border:1px solid var(--border); background:transparent; color:var(--text-dim);
-  padding:8px 16px; border-radius:20px; font-size:12px; letter-spacing:0.6px;
-  text-transform:uppercase; cursor:pointer; transition:all 0.15s ease; font-family:'Inter',sans-serif;
-  white-space:nowrap;
-}
-.pill:hover{ border-color:var(--gold-soft); color:var(--text); }
-.pill.active{ border-color:var(--gold); color:var(--gold); background:rgba(201,162,74,0.08); }
-
-/* ---------- Grid ---------- */
-.grid{
-  padding: 28px 28px 40px;
-  display:grid; grid-template-columns:repeat(auto-fill, minmax(230px,1fr)); gap:18px;
-}
-.empty-state{
-  padding: 60px 28px; text-align:center; color:var(--text-dim);
-  font-family:'Cormorant Garamond',serif; font-style:italic; font-size:20px;
+#overlayWrap {
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform: translate(-50%,-50%) scale(1) rotate(0deg);
+  touch-action:none;
+  max-width:none;
+  /* Taille par défaut avant chargement ; recalculée dynamiquement en JS
+     (fitOverlayToContent) selon le ratio réel de l'image ou du modèle
+     chargé, pour ne jamais rogner ni déformer le contenu. */
+  width: 92vw;
+  height: 92vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.card{
-  background:var(--bg-card); border:1px solid var(--border); border-radius:10px;
-  overflow:hidden; display:flex; flex-direction:column; transition:border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
-  cursor:pointer; box-shadow:0 1px 2px rgba(42,36,26,0.06);
-}
-.card:hover{ border-color:var(--gold); transform:translateY(-2px); background:var(--bg-card-hover); box-shadow:0 8px 20px rgba(42,36,26,0.12); }
+/* En mode 3D, le modèle a besoin de ses propres gestes tactiles natifs
+   (orbite / pan / zoom gérés par model-viewer). On laisse le navigateur
+   les traiter normalement au lieu de tout bloquer au niveau du wrapper. */
+#overlayWrap.mode-3d { touch-action: auto; }
 
-.card-media{ position:relative; aspect-ratio:3/4; background:#000; overflow:hidden; }
-.card-media img{ width:100%; height:100%; object-fit:cover; display:block; opacity:0.92; }
-
-.badge-type{
-  position:absolute; top:10px; left:10px; z-index:2;
-  width:34px; height:34px; border-radius:50%;
-  background:rgba(11,11,10,0.75); border:1px solid var(--gold);
-  color:var(--gold); font-size:10px; font-weight:700; letter-spacing:0.5px;
-  display:flex; align-items:center; justify-content:center; backdrop-filter:blur(4px);
-}
-
-.badge-sequence{
-  position:absolute; top:10px; right:10px; z-index:2;
-  background:rgba(11,11,10,0.75); border:1px solid rgba(255,255,255,0.15);
-  color:#f3f1ec; font-size:10px; padding:5px 9px; border-radius:12px;
-  backdrop-filter:blur(4px);
+/* Styles communs pour overlay 2D et 3D */
+#overlayImg, model-viewer {
+  display:none;
+  width: 100%;
+  height: 100%;
+  max-width:none;
+  object-fit: contain; /* affiche l'image entière quel que soit son ratio, sans rognage ni déformation */
+  filter: none;
+  opacity: 0.6;
+  user-select:none;
+  -webkit-user-drag:none;
 }
 
-.step-dots{
-  position:absolute; bottom:10px; left:0; right:0; z-index:2;
-  display:flex; justify-content:center; gap:6px;
+#overlayImg.active, model-viewer.active {
+  display: block;
 }
-.step-dot{
-  width:8px; height:8px; border-radius:50%; background:rgba(255,255,255,0.3);
-  border:none; cursor:pointer; padding:0; transition:background 0.15s ease, transform 0.15s ease;
-}
-.step-dot.active{ background:var(--gold); transform:scale(1.25); }
 
-.card-body{ padding:14px 15px 16px; display:flex; flex-direction:column; gap:9px; }
-.card-title{ font-size:14px; font-weight:600; line-height:1.35; }
-.card-tags{ display:flex; gap:6px; flex-wrap:wrap; }
-.tag{
-  font-size:9.5px; letter-spacing:0.5px; text-transform:uppercase; padding:3px 8px;
-  border-radius:10px; border:1px solid var(--border); color:var(--text-dim);
+#overlayImg.edge, model-viewer.edge {
+  filter: grayscale(1) contrast(1.4);
+  mix-blend-mode: multiply;
 }
-.tag.niveau-débutant{ color:var(--green); border-color:rgba(79,138,95,0.4); }
-.tag.niveau-intermédiaire{ color:var(--gold-soft); border-color:rgba(138,106,36,0.35); }
-.tag.niveau-avancé{ color:var(--terracotta); border-color:rgba(180,92,55,0.4); }
+model-viewer.edge { mix-blend-mode: normal; } /* le blend multiply ne s'applique pas bien au canvas WebGL */
 
-.card-cta{
-  margin-top:4px; display:flex; align-items:center; justify-content:space-between;
-  font-size:11px; letter-spacing:0.8px; text-transform:uppercase; color:var(--gold);
+/* Mode AR Pro : teinte le calque en bleu ou rouge, pour bien le distinguer
+   du trait au crayon/encre sur le papier et repérer les écarts de
+   proportions en un coup d'œil. */
+#overlayImg.tint-blue, model-viewer.tint-blue {
+  filter: grayscale(1) sepia(1) hue-rotate(180deg) saturate(6) brightness(1.05);
+  mix-blend-mode: multiply;
 }
-.card-cta span.arrow{ transition:transform 0.15s ease; }
-.card:hover .card-cta span.arrow{ transform:translateX(3px); }
+#overlayImg.tint-red, model-viewer.tint-red {
+  filter: grayscale(1) sepia(1) hue-rotate(-50deg) saturate(6) brightness(1.05);
+  mix-blend-mode: multiply;
+}
+model-viewer.tint-blue, model-viewer.tint-red { mix-blend-mode: normal; }
 
-@media (max-width:520px){
-  header{ padding:18px 18px 14px; }
-  .intro, .filters, .grid{ padding-left:18px; padding-right:18px; }
-  .grid{ grid-template-columns:repeat(auto-fill, minmax(150px,1fr)); gap:12px; }
-}
+/* Placeholder */
+#placeholder { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; color:#fff; background:rgba(0,0,0,0.55); text-align:center; padding:32px; z-index: 10; }
+#placeholder p { opacity:0.75; max-width:280px; line-height:1.4; font-size:14px; }
+.btn-primary { background:#6c5ce7; color:#fff; border:none; padding:14px 28px; border-radius:30px; font-size:15px; font-weight:600; cursor:pointer; }
+
+/* Topbar */
+#topbar { position:fixed; top:0; left:0; right:0; z-index:20; display:flex; justify-content:space-between; align-items:center; padding: max(14px, env(safe-area-inset-top)) 14px 14px; background:linear-gradient(to bottom, rgba(0,0,0,0.65), transparent); transition: opacity 0.25s ease; }
+#topbar h1 { color:#fff; font-size:14px; font-weight:600; letter-spacing:0.3px; }
+#topbar h1 span { color:#a29bfe; }
+.icon-btn { width:40px; height:40px; border-radius:50%; border:none; background:rgba(255,255,255,0.12); color:#fff; font-size:18px; display:flex; align-items:center; justify-content:center; cursor:pointer; backdrop-filter: blur(6px); }
+
+/* Controls */
+#controls { position:fixed; left:0; right:0; bottom:0; z-index:20; padding: 14px 18px max(18px, env(safe-area-inset-bottom)); background:linear-gradient(to top, rgba(0,0,0,0.75), transparent); display:flex; flex-direction:column; gap:14px; transition: transform 0.25s ease, opacity 0.25s ease; }
+#controls.hidden { transform: translateY(120%); opacity:0; pointer-events:none; }
+.slider-row { display:flex; align-items:center; gap:10px; color:#fff; font-size:12px; }
+.slider-row span:first-child { width:38px; opacity:0.7; }
+input[type=range] { flex:1; -webkit-appearance:none; height:4px; border-radius:2px; background:rgba(255,255,255,0.25); outline:none; }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:20px; height:20px; border-radius:50%; background:#6c5ce7; border:2px solid #fff; cursor:pointer; }
+.action-row { display:flex; justify-content:center; align-items:center; gap:22px; }
+.action-btn { display:flex; flex-direction:column; align-items:center; gap:5px; background:none; border:none; color:#fff; font-size:10px; cursor:pointer; }
+.action-btn .circle { width:52px; height:52px; border-radius:50%; background:rgba(255,255,255,0.14); display:flex; align-items:center; justify-content:center; font-size:20px; backdrop-filter: blur(6px); }
+.action-btn.lock .circle.active { background:#e17055; }
+.action-btn.mirror .circle.active { background:#00b894; }
+.action-btn.edge .circle.active { background:#0984e3; }
+#fileInput { display:none; }
+#hint { position:fixed; top:70px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.6); color:#fff; font-size:12px; padding:7px 14px; border-radius:16px; z-index:20; opacity:0; transition:opacity 0.3s ease; pointer-events:none; text-align:center; white-space:nowrap; max-width:85vw; white-space:normal; text-align:center; }
+#hint.show { opacity:1; }
+#camError { position:fixed; inset:0; display:none; z-index:30; background:#111; color:#fff; align-items:center; justify-content:center; flex-direction:column; gap:12px; padding:32px; text-align:center; }
+#camError.show { display:flex; }
+#camError p { opacity:0.7; font-size:13px; max-width:280px; line-height:1.5; }
 </style>
 </head>
 <body>
 
-<header>
-  <div class="logo">Scol<em>artist</em></div>
-  <nav class="nav-crumbs">
-    <a href="index.html">Day Drawing Challenge</a>
-    <span class="dot">·</span>
-    <span class="current">Galerie AR</span>
-  </nav>
-</header>
+<div id="stage">
+  <video id="camera" autoplay playsinline muted></video>
 
-<div class="intro">
-  <h1>Bibliothèque de références AR</h1>
-  <p>Choisis une référence 2D ou un modèle 3D à superposer sur ta caméra pour décalquer, orbiter et étudier les proportions — puis lance-toi dans le Day Drawing Challenge sans filet.</p>
-</div>
+  <div id="overlayWrap">
+    <!-- Overlay Image 2D -->
+    <img id="overlayImg" alt="référence">
 
-<div class="filters">
-  <div>
-    <div class="filter-label">Catégorie</div>
-    <div class="pill-row" id="categoryFilters"></div>
+    <!-- Overlay Modèle 3D AR (model-viewer gère lui-même orbite/pan/zoom) -->
+    <model-viewer
+      id="overlay3D"
+      camera-controls
+      touch-action="pan-y"
+      shadow-intensity="0.5"
+      interaction-prompt="none"
+      exposure="1.2">
+    </model-viewer>
   </div>
-  <div>
-    <div class="filter-label">Type</div>
-    <div class="pill-row" id="typeFilters">
-      <button class="pill active" data-type="tous">Tous</button>
-      <button class="pill" data-type="2D">2D</button>
-      <button class="pill" data-type="3D">3D</button>
+
+  <div id="placeholder">
+    <div style="font-size:38px;">🎨</div>
+    <p><strong>Superpose une image 2D ou un modèle 3D (.glb)</strong><br>sur ta caméra pour décalquer ou étudier l'anatomie à 360°.</p>
+    <button class="btn-primary" id="pickBtn">Choisir un fichier (2D / 3D)</button>
+    <div style="display:flex; gap:8px; width:100%; max-width:320px; margin-top:4px;">
+      <input type="text" id="urlInput" placeholder="ou colle une URL (https://scolartist.fr/...)"
+        style="flex:1; padding:10px 12px; border-radius:20px; border:none; font-size:13px; background:rgba(255,255,255,0.12); color:#fff;">
+      <button class="icon-btn" id="urlLoadBtn" title="Charger depuis l'URL">➜</button>
     </div>
   </div>
 </div>
 
-<div class="grid" id="grid"></div>
+<div id="camError">
+  <div style="font-size:34px;">📷</div>
+  <p><strong>Caméra inaccessible ici</strong><br> Ouvre ce fichier directement sur ton téléphone (en HTTPS) pour activer la vidéo.</p>
+</div>
+
+<!-- On autorise à la fois les images et les modèles 3D (.glb, .gltf) -->
+<input type="file" id="fileInput" accept="image/*,.glb,.gltf,.heic,.heif">
+
+<div id="topbar">
+  <button class="icon-btn" id="backBtn" title="Retour à la galerie">←</button>
+  <h1 id="pageTitle">Scolartist <span>AR Trace & 3D</span></h1>
+  <div style="display:flex; gap:8px;">
+    <button class="icon-btn" id="urlSwapBtn" title="Charger depuis une URL">🔗</button>
+    <button class="icon-btn" id="swapBtn" title="Changer de fichier">🖼️</button>
+  </div>
+</div>
+
+<div id="hint">Glisse pour déplacer · pince pour zoomer/tourner</div>
+
+<div id="controls" class="hidden">
+  <div class="slider-row">
+    <span>Opac.</span>
+    <input type="range" id="opacitySlider" min="5" max="95" value="60">
+  </div>
+  <div class="action-row">
+    <button class="action-btn edge" id="edgeBtn">
+      <span class="circle">✏️</span> <span id="edgeLabel">Normal</span>
+    </button>
+    <button class="action-btn mirror" id="mirrorBtn">
+      <span class="circle">⇋</span> Miroir
+    </button>
+    <button class="action-btn lock" id="lockBtn">
+      <span class="circle">🔓</span> Verrouiller
+    </button>
+  </div>
+</div>
 
 <script>
-// ------------------------------------------------------------------
-// Source des données : pour l'instant un data.json statique à côté
-// de cette page. Plus tard, remplace DATA_URL par l'URL du webhook
-// n8n qui lit directement le Google Sheet "Bibliothèque AR" —
-// aucune autre ligne de ce script n'a besoin de changer.
-// ------------------------------------------------------------------
-const DATA_URL = 'data.json';
-const VIEWER_URL = 'ar-viewer.html';
+(function(){
+  const video = document.getElementById('camera');
+  const overlayWrap = document.getElementById('overlayWrap');
+  const overlayImg = document.getElementById('overlayImg');
+  const overlay3D = document.getElementById('overlay3D');
+  const placeholder = document.getElementById('placeholder');
+  const controls = document.getElementById('controls');
+  const opacitySlider = document.getElementById('opacitySlider');
+  const lockBtn = document.getElementById('lockBtn');
+  const mirrorBtn = document.getElementById('mirrorBtn');
+  const edgeBtn = document.getElementById('edgeBtn');
+  const swapBtn = document.getElementById('swapBtn');
+  const pickBtn = document.getElementById('pickBtn');
+  const fileInput = document.getElementById('fileInput');
+  const hint = document.getElementById('hint');
+  const camError = document.getElementById('camError');
+  const pageTitle = document.getElementById('pageTitle');
+  const backBtn = document.getElementById('backBtn');
 
-const grid = document.getElementById('grid');
-const categoryFiltersEl = document.getElementById('categoryFilters');
-const typeFiltersEl = document.getElementById('typeFilters');
-
-let activeCategory = 'Tous';
-let activeType = 'tous';
-let groups = [];
-
-function niveauClass(niveau){
-  return 'niveau-' + (niveau || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-}
-
-function groupBySequence(items){
-  const out = [];
-  const bySeq = {};
-  for(const item of items){
-    if(item.sequence_id){
-      if(!bySeq[item.sequence_id]) bySeq[item.sequence_id] = [];
-      bySeq[item.sequence_id].push(item);
+  backBtn.addEventListener('click', ()=>{
+    // Retour à la galerie si on y accède depuis un lien, sinon retour navigateur
+    if (document.referrer && document.referrer.includes('ar-gallery')) {
+      history.back();
     } else {
-      out.push({ single: item, steps: [item] });
+      location.href = 'ar-gallery.html';
+    }
+  });
+
+  let activeMode = null; // '2d' ou '3d'
+
+  let state = {
+    x:0, y:0, scale:1, rotate:0, mirrored:false, locked:false
+  };
+
+  let wakeLock = null;
+  async function requestWakeLock(){
+    try{ if('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); }catch(e){}
+  }
+
+  function applyTransform(){
+    overlayWrap.style.transform = `translate(-50%,-50%) translate(${state.x}px, ${state.y}px) scale(${state.scale * (state.mirrored?-1:1)}, ${state.scale}) rotate(${state.rotate}deg)`;
+  }
+
+  function showHint(msg){
+    if(msg) hint.textContent = msg;
+    hint.classList.add('show');
+    setTimeout(()=>hint.classList.remove('show'), msg ? 4200 : 2400);
+  }
+
+  // --- camera ---
+  async function startCamera(){
+    try{
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio:false });
+      video.srcObject = stream;
+    }catch(err){
+      camError.classList.add('show');
     }
   }
-  for(const seqId in bySeq){
-    const steps = bySeq[seqId].sort((a,b)=> (a.etape||0) - (b.etape||0));
-    out.push({ single: steps[0], steps });
-  }
-  return out;
-}
+  startCamera();
 
-function cardHTML(group){
-  const first = group.single;
-  const isSeq = group.steps.length > 1;
-  const typeLabel = first.type;
-  const tags = [first.sous_categorie, first.niveau].filter(Boolean);
-
-  return `
-    <div class="card" data-category="${first.categorie_principale}" data-type="${first.type}" data-step="0">
-      <div class="card-media">
-        <div class="badge-type">${typeLabel}</div>
-        ${isSeq ? `<div class="badge-sequence">${group.steps.length} étapes</div>` : ''}
-        <img src="${group.steps[0].url_thumb}" alt="${first.titre}" loading="lazy"
-             onerror="this.style.opacity='0.15'">
-        ${isSeq ? `<div class="step-dots">${group.steps.map((s,i)=>
-            `<button class="step-dot ${i===0?'active':''}" data-idx="${i}" title="Étape ${s.etape}"></button>`
-          ).join('')}</div>` : ''}
-      </div>
-      <div class="card-body">
-        <div class="card-title">${first.titre.replace(/\s*[—-]\s*[ÉEeé]tape.*$/,'')}</div>
-        <div class="card-tags">${tags.map(t=>`<span class="tag ${t===first.niveau?niveauClass(t):''}">${t}</span>`).join('')}</div>
-        <div class="card-cta">
-          <span>Ouvrir en AR</span>
-          <span class="arrow">→</span>
-        </div>
-      </div>
-    </div>`;
-}
-
-function render(){
-  const filtered = groups.filter(g=>{
-    const catOk = activeCategory==='Tous' || g.single.categorie_principale===activeCategory;
-    const typeOk = activeType==='tous' || g.single.type===activeType;
-    return catOk && typeOk;
-  });
-
-  if(filtered.length===0){
-    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">Aucune référence dans cette sélection pour l'instant.</div>`;
-    return;
+  // --- Dimensionnement dynamique du cadre ---
+  // Calcule la taille du cadre #overlayWrap selon le ratio réel du contenu
+  // chargé (photo ou modèle 3D), pour ne jamais rogner ni déformer,
+  // quel que soit le format (portrait 9:16, paysage, carré...).
+  function fitOverlayToContent(w, h){
+    if(!w || !h){ w = 1; h = 1; }
+    const maxW = window.innerWidth * 0.92;
+    const maxH = window.innerHeight * 0.75;
+    let targetW = maxW;
+    let targetH = targetW * (h / w);
+    if(targetH > maxH){
+      targetH = maxH;
+      targetW = targetH * (w / h);
+    }
+    overlayWrap.style.width = targetW + 'px';
+    overlayWrap.style.height = targetH + 'px';
   }
 
-  grid.innerHTML = filtered.map(cardHTML).join('');
+  // --- Conversion HEIC/HEIF (photos iPhone) en JPEG ---
+  // Les navigateurs (Chrome/Android compris) ne savent pas afficher le HEIC
+  // nativement : on le convertit en JPEG côté client avant de l'utiliser.
+  async function convertIfHeic(file, name){
+    const ext = name.split('.').pop().toLowerCase();
+    if(ext !== 'heic' && ext !== 'heif') return { file, name };
+    if(typeof heic2any === 'undefined'){
+      alert("Impossible de convertir cette photo HEIC (librairie non chargée). Essaie une photo JPEG/PNG.");
+      return { file, name };
+    }
+    showHint("Conversion de la photo HEIC…");
+    try{
+      const convertedBlob = await heic2any({ blob: file, toType: 'image/jpeg', quality: 0.92 });
+      const newName = name.replace(/\.(heic|heif)$/i, '.jpg');
+      return { file: convertedBlob, name: newName };
+    }catch(err){
+      console.warn('Conversion HEIC échouée', err);
+      alert("La conversion de cette photo HEIC a échoué. Essaie une photo JPEG/PNG.");
+      return { file, name };
+    }
+  }
 
-  // Étape active par carte (pour les carrousels step-by-step)
-  const cards = grid.querySelectorAll('.card');
-  cards.forEach((cardEl, i)=>{
-    const group = filtered[i];
+  // --- file/URL loading (Support 2D & 3D) ---
+  // `source` peut être un objet File (depuis le picker) ou une chaîne URL (https://...)
+  async function loadSource(source){
+    if(!source) return;
+    let url, name;
+    if(typeof source === 'string'){
+      url = source;
+      name = source.split('?')[0]; // ignore les query params pour détecter l'extension
+    } else {
+      name = source.name;
+      const converted = await convertIfHeic(source, name);
+      source = converted.file;
+      name = converted.name;
+      url = URL.createObjectURL(source);
+    }
+    const ext = name.split('.').pop().toLowerCase();
 
-    cardEl.querySelectorAll('.step-dot').forEach(dot=>{
-      dot.addEventListener('click', e=>{
-        e.stopPropagation();
-        const idx = parseInt(dot.dataset.idx, 10);
-        cardEl.dataset.step = idx;
-        cardEl.querySelectorAll('.step-dot').forEach(d=>d.classList.remove('active'));
-        dot.classList.add('active');
-        cardEl.querySelector('.card-media img').src = group.steps[idx].url_thumb;
-      });
+    if(ext === 'glb' || ext === 'gltf'){
+      // Mode 3D : on laisse model-viewer gérer ses propres gestes
+      // (orbite 1 doigt, pan 2 doigts, zoom pincer) plutôt que le
+      // système de drag/pinch du wrapper, pour éviter tout conflit.
+      activeMode = '3d';
+      overlayWrap.classList.add('mode-3d');
+      overlayImg.classList.remove('active');
+      overlay3D.src = url;
+      overlay3D.classList.add('active');
+      overlay3D.style.opacity = (opacitySlider.value / 100).toFixed(2);
+      overlay3D.setAttribute('camera-controls', '');
+      fitOverlayToContent(1, 1); // cadre carré par défaut pour un modèle 3D
+
+      placeholder.style.display = 'none';
+      controls.classList.remove('hidden');
+      showHint("Glisse le modèle pour l'orbiter, pince pour zoomer. Verrouille une fois la pose trouvée.");
+    } else {
+      // Mode 2D classique : le wrapper gère drag/pinch/rotate lui-même
+      activeMode = '2d';
+      overlayWrap.classList.remove('mode-3d');
+      overlay3D.classList.remove('active');
+      overlayImg.src = url;
+      overlayImg.classList.add('active');
+      overlayImg.style.opacity = (opacitySlider.value / 100).toFixed(2);
+
+      overlayImg.onload = () => {
+        fitOverlayToContent(overlayImg.naturalWidth, overlayImg.naturalHeight);
+        placeholder.style.display = 'none';
+        controls.classList.remove('hidden');
+        showHint();
+      };
+    }
+    requestWakeLock();
+  }
+
+  window.addEventListener('resize', ()=>{
+    if(activeMode === '2d' && overlayImg.naturalWidth){
+      fitOverlayToContent(overlayImg.naturalWidth, overlayImg.naturalHeight);
+    } else if(activeMode === '3d'){
+      fitOverlayToContent(1, 1);
+    }
+  });
+
+  pickBtn.addEventListener('click', ()=> fileInput.click());
+  swapBtn.addEventListener('click', ()=> fileInput.click());
+  fileInput.addEventListener('change', e => loadSource(e.target.files[0]));
+
+  const urlInput = document.getElementById('urlInput');
+  const urlLoadBtn = document.getElementById('urlLoadBtn');
+  const urlSwapBtn = document.getElementById('urlSwapBtn');
+
+  function loadFromUrlField(){
+    const val = urlInput.value.trim();
+    if(val) loadSource(val);
+  }
+  urlLoadBtn.addEventListener('click', loadFromUrlField);
+  urlInput.addEventListener('keydown', e => { if(e.key === 'Enter') loadFromUrlField(); });
+
+  urlSwapBtn.addEventListener('click', ()=>{
+    const val = prompt("URL de l'image ou du modèle .glb (ex: https://scolartist.fr/library/modele.glb)");
+    if(val) loadSource(val.trim());
+  });
+
+  // --- Opacité ---
+  opacitySlider.addEventListener('input', e=>{
+    const val = (e.target.value/100).toFixed(2);
+    overlayImg.style.opacity = val;
+    overlay3D.style.opacity = val;
+  });
+
+  // --- Mode Filtre : Normal → Contours → Bleu → Rouge (AR Pro) ---
+  // Le bleu/rouge sert à vérifier les proportions : un calque coloré
+  // tranche bien mieux avec un trait crayon/encre qu'un calque gris.
+  const FILTER_MODES = [
+    { cls: null,        label: 'Normal' },
+    { cls: 'edge',      label: 'Contours' },
+    { cls: 'tint-blue', label: 'Bleu' },
+    { cls: 'tint-red',  label: 'Rouge' },
+  ];
+  let filterIndex = 0;
+  const edgeLabel = document.getElementById('edgeLabel');
+
+  function applyFilterMode(idx){
+    FILTER_MODES.forEach(m=>{
+      if(m.cls){ overlayImg.classList.remove(m.cls); overlay3D.classList.remove(m.cls); }
     });
+    const mode = FILTER_MODES[idx];
+    if(mode.cls){ overlayImg.classList.add(mode.cls); overlay3D.classList.add(mode.cls); }
+    edgeLabel.textContent = mode.label;
+    edgeBtn.querySelector('.circle').classList.toggle('active', !!mode.cls);
+  }
 
-    cardEl.addEventListener('click', ()=>{
-      const idx = parseInt(cardEl.dataset.step, 10) || 0;
-      const item = group.steps[idx];
-      const url = `${VIEWER_URL}?src=${encodeURIComponent(item.url_fichier)}&titre=${encodeURIComponent(item.titre)}`;
-      location.href = url;
-    });
+  edgeBtn.addEventListener('click', ()=>{
+    filterIndex = (filterIndex + 1) % FILTER_MODES.length;
+    applyFilterMode(filterIndex);
   });
-}
 
-function buildCategoryFilters(items){
-  const cats = ['Tous', ...new Set(items.map(i=>i.categorie_principale))];
-  categoryFiltersEl.innerHTML = cats.map(c=>
-    `<button class="pill ${c===activeCategory?'active':''}" data-cat="${c}">${c}</button>`
-  ).join('');
-  categoryFiltersEl.querySelectorAll('.pill').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      activeCategory = btn.dataset.cat;
-      categoryFiltersEl.querySelectorAll('.pill').forEach(b=>b.classList.remove('active'));
-      btn.classList.add('active');
-      render();
-    });
+  // --- Miroir (s'applique au wrapper entier, fonctionne pour 2D et 3D) ---
+  mirrorBtn.addEventListener('click', ()=>{
+    state.mirrored = !state.mirrored;
+    mirrorBtn.querySelector('.circle').classList.toggle('active', state.mirrored);
+    applyTransform();
   });
-}
 
-typeFiltersEl.querySelectorAll('.pill').forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    activeType = btn.dataset.type;
-    typeFiltersEl.querySelectorAll('.pill').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    render();
-  });
-});
+  // --- Verrouillage ---
+  // 2D : fige totalement la position (plus de drag possible).
+  // 3D : coupe camera-controls pour figer l'orbite du modèle, tout en
+  //      gardant la possibilité de repositionner/redimensionner le
+  //      cadre entier (comme en 2D) une fois la pose choisie.
+  lockBtn.addEventListener('click', ()=>{
+    state.locked = !state.locked;
+    lockBtn.querySelector('.circle').classList.toggle('active', state.locked);
+    lockBtn.querySelector('.circle').textContent = state.locked ? '🔒' : '🔓';
+    lockBtn.lastChild.textContent = state.locked ? ' Verrouillé' : ' Verrouiller';
+    document.getElementById('topbar').style.opacity = state.locked ? '0.35' : '1';
 
-fetch(DATA_URL)
-  .then(r=>r.json())
-  .then(items=>{
-    groups = groupBySequence(items);
-    buildCategoryFilters(items);
-    render();
-  })
-  .catch(()=>{
-    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">Impossible de charger la bibliothèque (data.json introuvable ou invalide).</div>`;
+    if(activeMode === '3d'){
+      if(state.locked){
+        overlay3D.removeAttribute('camera-controls');
+        overlayWrap.classList.remove('mode-3d'); // rend la main au wrapper pour repositionner le cadre figé
+      } else {
+        overlay3D.setAttribute('camera-controls', '');
+        overlayWrap.classList.add('mode-3d'); // rend la main à model-viewer pour orbiter à nouveau
+      }
+    }
   });
+
+  // --- Gestes: drag + pinch (rotate & scale) sur le wrapper ---
+  // Actifs en mode 2D toujours, et en mode 3D seulement une fois verrouillé
+  // (sinon on laisse model-viewer gérer ses propres gestes tactiles).
+  let pointers = new Map();
+  let gestureStart = null;
+
+  function wrapperGesturesActive(){
+    return activeMode === '2d' || (activeMode === '3d' && state.locked);
+  }
+
+  overlayWrap.addEventListener('pointerdown', e=>{
+    if(!wrapperGesturesActive()) return;
+    overlayWrap.setPointerCapture(e.pointerId);
+    pointers.set(e.pointerId, {x:e.clientX, y:e.clientY});
+    if(pointers.size === 1){
+      gestureStart = { type:'drag', startX:e.clientX, startY:e.clientY, origX:state.x, origY:state.y };
+    } else if(pointers.size === 2){
+      const pts = [...pointers.values()];
+      const dx = pts[0].x - pts[1].x, dy = pts[0].y - pts[1].y;
+      gestureStart = {
+        type:'pinch',
+        dist: Math.hypot(dx,dy),
+        angle: Math.atan2(dy,dx) * 180/Math.PI,
+        origScale: state.scale,
+        origRotate: state.rotate
+      };
+    }
+  });
+
+  overlayWrap.addEventListener('pointermove', e=>{
+    if(!wrapperGesturesActive() || !pointers.has(e.pointerId)) return;
+    pointers.set(e.pointerId, {x:e.clientX, y:e.clientY});
+
+    if(gestureStart && gestureStart.type==='drag' && pointers.size===1){
+      state.x = gestureStart.origX + (e.clientX - gestureStart.startX);
+      state.y = gestureStart.origY + (e.clientY - gestureStart.startY);
+      applyTransform();
+    } else if(gestureStart && gestureStart.type==='pinch' && pointers.size===2){
+      const pts = [...pointers.values()];
+      const dx = pts[0].x - pts[1].x, dy = pts[0].y - pts[1].y;
+      const dist = Math.hypot(dx,dy);
+      const angle = Math.atan2(dy,dx) * 180/Math.PI;
+      state.scale = Math.max(0.1, gestureStart.origScale * (dist / gestureStart.dist));
+      state.rotate = gestureStart.origRotate + (angle - gestureStart.angle);
+      applyTransform();
+    }
+  });
+
+  function endPointer(e){
+    pointers.delete(e.pointerId);
+    if(pointers.size === 1){
+      const [p] = pointers.values();
+      gestureStart = { type:'drag', startX:p.x, startY:p.y, origX:state.x, origY:state.y };
+    } else if(pointers.size === 0){
+      gestureStart = null;
+    }
+  }
+  overlayWrap.addEventListener('pointerup', endPointer);
+  overlayWrap.addEventListener('pointercancel', endPointer);
+
+  applyTransform();
+
+  // --- Chargement automatique depuis la galerie (?src=...&titre=...) ---
+  const params = new URLSearchParams(location.search);
+  const srcParam = params.get('src');
+  const titreParam = params.get('titre');
+  if (titreParam) {
+    pageTitle.innerHTML = `Scolartist <span>${titreParam}</span>`;
+  }
+  if (srcParam) {
+    loadSource(decodeURIComponent(srcParam));
+  }
+})();
 </script>
-
 </body>
 </html>
