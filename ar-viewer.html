@@ -5,8 +5,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Scolartist – AR Drawing & 3D Viewer Prototype</title>
 
+<!-- Décodeur Meshopt : nécessaire pour charger les .glb compressés avec
+     gltfpack -cc (extension EXT_meshopt_compression), sinon model-viewer
+     télécharge le fichier mais n'affiche rien. Doit être configuré AVANT
+     que le script model-viewer ci-dessous ne s'exécute. -->
+<script>
+  self.ModelViewerElement = self.ModelViewerElement || {};
+  self.ModelViewerElement.meshoptDecoderLocation = 'https://unpkg.com/meshoptimizer@0.22.0/meshopt_decoder.js';
+</script>
+
 <!-- Google Model-Viewer pour la lecture 3D GLB/GLTF -->
-<script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js"></script>
+<script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+
+<!-- Conversion des photos HEIC/HEIF (iPhone) en JPEG, car les navigateurs ne les lisent pas nativement -->
+<script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
 
 <style>
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
@@ -21,8 +33,11 @@ html, body { height:100%; overflow:hidden; background:#0a0a0a; font-family: -app
   transform: translate(-50%,-50%) scale(1) rotate(0deg);
   touch-action:none;
   max-width:none;
-  width: 320px;
-  height: 480px;
+  /* Taille par défaut avant chargement ; recalculée dynamiquement en JS
+     (fitOverlayToContent) selon le ratio réel de l'image ou du modèle
+     chargé, pour ne jamais rogner ni déformer le contenu. */
+  width: 92vw;
+  height: 92vw;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -39,6 +54,7 @@ html, body { height:100%; overflow:hidden; background:#0a0a0a; font-family: -app
   width: 100%;
   height: 100%;
   max-width:none;
+  object-fit: contain; /* affiche l'image entière quel que soit son ratio, sans rognage ni déformation */
   filter: none;
   opacity: 0.6;
   user-select:none;
@@ -54,6 +70,19 @@ html, body { height:100%; overflow:hidden; background:#0a0a0a; font-family: -app
   mix-blend-mode: multiply;
 }
 model-viewer.edge { mix-blend-mode: normal; } /* le blend multiply ne s'applique pas bien au canvas WebGL */
+
+/* Mode AR Pro : teinte le calque en bleu ou rouge, pour bien le distinguer
+   du trait au crayon/encre sur le papier et repérer les écarts de
+   proportions en un coup d'œil. */
+#overlayImg.tint-blue, model-viewer.tint-blue {
+  filter: grayscale(1) sepia(1) hue-rotate(180deg) saturate(6) brightness(1.05);
+  mix-blend-mode: multiply;
+}
+#overlayImg.tint-red, model-viewer.tint-red {
+  filter: grayscale(1) sepia(1) hue-rotate(-50deg) saturate(6) brightness(1.05);
+  mix-blend-mode: multiply;
+}
+model-viewer.tint-blue, model-viewer.tint-red { mix-blend-mode: normal; }
 
 /* Placeholder */
 #placeholder { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; color:#fff; background:rgba(0,0,0,0.55); text-align:center; padding:32px; z-index: 10; }
@@ -125,7 +154,7 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:20px; h
 </div>
 
 <!-- On autorise à la fois les images et les modèles 3D (.glb, .gltf) -->
-<input type="file" id="fileInput" accept="image/*,.glb,.gltf">
+<input type="file" id="fileInput" accept="image/*,.glb,.gltf,.heic,.heif">
 
 <div id="topbar">
   <button class="icon-btn" id="backBtn" title="Retour à la galerie">←</button>
@@ -145,7 +174,7 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:20px; h
   </div>
   <div class="action-row">
     <button class="action-btn edge" id="edgeBtn">
-      <span class="circle">✏️</span> Contours
+      <span class="circle">✏️</span> <span id="edgeLabel">Normal</span>
     </button>
     <button class="action-btn mirror" id="mirrorBtn">
       <span class="circle">⇋</span> Miroir
@@ -217,17 +246,60 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:20px; h
   }
   startCamera();
 
+  // --- Dimensionnement dynamique du cadre ---
+  // Calcule la taille du cadre #overlayWrap selon le ratio réel du contenu
+  // chargé (photo ou modèle 3D), pour ne jamais rogner ni déformer,
+  // quel que soit le format (portrait 9:16, paysage, carré...).
+  function fitOverlayToContent(w, h){
+    if(!w || !h){ w = 1; h = 1; }
+    const maxW = window.innerWidth * 0.92;
+    const maxH = window.innerHeight * 0.75;
+    let targetW = maxW;
+    let targetH = targetW * (h / w);
+    if(targetH > maxH){
+      targetH = maxH;
+      targetW = targetH * (w / h);
+    }
+    overlayWrap.style.width = targetW + 'px';
+    overlayWrap.style.height = targetH + 'px';
+  }
+
+  // --- Conversion HEIC/HEIF (photos iPhone) en JPEG ---
+  // Les navigateurs (Chrome/Android compris) ne savent pas afficher le HEIC
+  // nativement : on le convertit en JPEG côté client avant de l'utiliser.
+  async function convertIfHeic(file, name){
+    const ext = name.split('.').pop().toLowerCase();
+    if(ext !== 'heic' && ext !== 'heif') return { file, name };
+    if(typeof heic2any === 'undefined'){
+      alert("Impossible de convertir cette photo HEIC (librairie non chargée). Essaie une photo JPEG/PNG.");
+      return { file, name };
+    }
+    showHint("Conversion de la photo HEIC…");
+    try{
+      const convertedBlob = await heic2any({ blob: file, toType: 'image/jpeg', quality: 0.92 });
+      const newName = name.replace(/\.(heic|heif)$/i, '.jpg');
+      return { file: convertedBlob, name: newName };
+    }catch(err){
+      console.warn('Conversion HEIC échouée', err);
+      alert("La conversion de cette photo HEIC a échoué. Essaie une photo JPEG/PNG.");
+      return { file, name };
+    }
+  }
+
   // --- file/URL loading (Support 2D & 3D) ---
   // `source` peut être un objet File (depuis le picker) ou une chaîne URL (https://...)
-  function loadSource(source){
+  async function loadSource(source){
     if(!source) return;
     let url, name;
     if(typeof source === 'string'){
       url = source;
       name = source.split('?')[0]; // ignore les query params pour détecter l'extension
     } else {
-      url = URL.createObjectURL(source);
       name = source.name;
+      const converted = await convertIfHeic(source, name);
+      source = converted.file;
+      name = converted.name;
+      url = URL.createObjectURL(source);
     }
     const ext = name.split('.').pop().toLowerCase();
 
@@ -242,6 +314,7 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:20px; h
       overlay3D.classList.add('active');
       overlay3D.style.opacity = (opacitySlider.value / 100).toFixed(2);
       overlay3D.setAttribute('camera-controls', '');
+      fitOverlayToContent(1, 1); // cadre carré par défaut pour un modèle 3D
 
       placeholder.style.display = 'none';
       controls.classList.remove('hidden');
@@ -256,6 +329,7 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:20px; h
       overlayImg.style.opacity = (opacitySlider.value / 100).toFixed(2);
 
       overlayImg.onload = () => {
+        fitOverlayToContent(overlayImg.naturalWidth, overlayImg.naturalHeight);
         placeholder.style.display = 'none';
         controls.classList.remove('hidden');
         showHint();
@@ -263,6 +337,14 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:20px; h
     }
     requestWakeLock();
   }
+
+  window.addEventListener('resize', ()=>{
+    if(activeMode === '2d' && overlayImg.naturalWidth){
+      fitOverlayToContent(overlayImg.naturalWidth, overlayImg.naturalHeight);
+    } else if(activeMode === '3d'){
+      fitOverlayToContent(1, 1);
+    }
+  });
 
   pickBtn.addEventListener('click', ()=> fileInput.click());
   swapBtn.addEventListener('click', ()=> fileInput.click());
@@ -291,13 +373,31 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:20px; h
     overlay3D.style.opacity = val;
   });
 
-  // --- Mode Contours / Filtre ---
-  let edgeOn = false;
+  // --- Mode Filtre : Normal → Contours → Bleu → Rouge (AR Pro) ---
+  // Le bleu/rouge sert à vérifier les proportions : un calque coloré
+  // tranche bien mieux avec un trait crayon/encre qu'un calque gris.
+  const FILTER_MODES = [
+    { cls: null,        label: 'Normal' },
+    { cls: 'edge',      label: 'Contours' },
+    { cls: 'tint-blue', label: 'Bleu' },
+    { cls: 'tint-red',  label: 'Rouge' },
+  ];
+  let filterIndex = 0;
+  const edgeLabel = document.getElementById('edgeLabel');
+
+  function applyFilterMode(idx){
+    FILTER_MODES.forEach(m=>{
+      if(m.cls){ overlayImg.classList.remove(m.cls); overlay3D.classList.remove(m.cls); }
+    });
+    const mode = FILTER_MODES[idx];
+    if(mode.cls){ overlayImg.classList.add(mode.cls); overlay3D.classList.add(mode.cls); }
+    edgeLabel.textContent = mode.label;
+    edgeBtn.querySelector('.circle').classList.toggle('active', !!mode.cls);
+  }
+
   edgeBtn.addEventListener('click', ()=>{
-    edgeOn = !edgeOn;
-    overlayImg.classList.toggle('edge', edgeOn);
-    overlay3D.classList.toggle('edge', edgeOn);
-    edgeBtn.querySelector('.circle').classList.toggle('active', edgeOn);
+    filterIndex = (filterIndex + 1) % FILTER_MODES.length;
+    applyFilterMode(filterIndex);
   });
 
   // --- Miroir (s'applique au wrapper entier, fonctionne pour 2D et 3D) ---
