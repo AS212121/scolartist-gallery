@@ -26,6 +26,13 @@ html, body { height:100%; overflow:hidden; background:#0a0a0a; font-family: -app
 #stage { position:fixed; inset:0; overflow:hidden; }
 #camera { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
 
+/* Mode Étude : masque la caméra, fond noir — pour observer le modèle
+   seul avant de passer en mode AR (utile pour un public étudiant qui
+   veut d'abord bien regarder la référence). N'affecte rien d'autre :
+   opacité, filtres, miroir, verrouillage, orbite 3D restent actifs. */
+body.mode-study #camera { display:none; }
+body.mode-study #stage { background:#000; }
+
 #overlayWrap {
   position:absolute;
   top:50%;
@@ -102,6 +109,7 @@ model-viewer.tint-blue, model-viewer.tint-red { mix-blend-mode: normal; }
 #topbar h1 { color:#fff; font-size:14px; font-weight:600; letter-spacing:0.3px; }
 #topbar h1 span { color:#a29bfe; }
 .icon-btn { width:40px; height:40px; border-radius:50%; border:none; background:rgba(255,255,255,0.12); color:#fff; font-size:18px; display:flex; align-items:center; justify-content:center; cursor:pointer; backdrop-filter: blur(6px); }
+.icon-btn.active { background:#6c5ce7; }
 
 /* Controls */
 #controls { position:fixed; left:0; right:0; bottom:0; z-index:20; padding: 14px 18px max(18px, env(safe-area-inset-bottom)); background:linear-gradient(to top, rgba(0,0,0,0.75), transparent); display:flex; flex-direction:column; gap:14px; transition: transform 0.25s ease, opacity 0.25s ease; }
@@ -168,6 +176,7 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:20px; h
   <button class="icon-btn" id="backBtn" title="Retour à la galerie">←</button>
   <h1 id="pageTitle">Scolartist <span>AR Trace & 3D</span></h1>
   <div style="display:flex; gap:8px;">
+    <button class="icon-btn" id="studyBtn" title="Vue étude (sans caméra)">🌑</button>
     <button class="icon-btn" id="urlSwapBtn" title="Charger depuis une URL">🔗</button>
     <button class="icon-btn" id="swapBtn" title="Changer de fichier">🖼️</button>
   </div>
@@ -220,6 +229,20 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:20px; h
     } else {
       location.href = 'ar-gallery.html';
     }
+  });
+
+  // --- Mode Étude : masque la caméra pour observer le modèle seul ---
+  const studyBtn = document.getElementById('studyBtn');
+  let studyMode = false;
+  studyBtn.addEventListener('click', ()=>{
+    studyMode = !studyMode;
+    document.body.classList.toggle('mode-study', studyMode);
+    studyBtn.classList.toggle('active', studyMode);
+    studyBtn.textContent = studyMode ? '📷' : '🌑';
+    studyBtn.title = studyMode ? 'Revenir en mode AR (caméra)' : 'Vue étude (sans caméra)';
+    showHint(studyMode
+      ? "Vue étude — observe le modèle librement, puis repasse en mode caméra pour décalquer"
+      : "Retour en mode AR");
   });
 
   let activeMode = null; // '2d' ou '3d'
