@@ -120,7 +120,11 @@
   .vote-btn.loading { opacity: 0.5; pointer-events: none; }
   .vote-btn svg { width: 11px; height: 11px; transition: transform 0.2s; }
   .vote-btn:hover svg, .vote-btn.voted svg { transform: scale(1.2); }
-  .vote-count { font-size: 0.55rem; color: var(--muted); }
+  .like-count { display: inline-flex; align-items: center; gap: 0.35rem; color: var(--muted); font-size: 0.8rem; }
+  .like-count svg { width: 14px; height: 14px; }
+  .like-count b { font-family: 'Cormorant Garamond', serif; font-size: 1.15rem; font-weight: 600; line-height: 1; }
+  .like-count.has-likes { color: var(--gold-light); }
+  .like-count.has-likes svg { fill: var(--gold-light); }
   .share-btn { font-family: 'DM Mono', monospace; font-size: 0.55rem; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.4rem 0.9rem; border: 1px solid var(--border); background: var(--surface2); color: var(--muted); cursor: pointer; transition: all 0.2s; border-radius: 50px; }
   .share-btn:hover { border-color: var(--cream); color: var(--cream); }
 
@@ -411,11 +415,11 @@
         '<div class="score-overlay"><div class="score-num">'+a.score+'</div><div class="score-label">Score IA</div></div>'+
         '</div><div class="card-body">'+
         '<div class="card-meta"><span class="artist-name">'+a.prenom+'</span><span class="challenge-day">J \u00B7 '+a.challenge_id+'</span></div>'+
-        '<div class="card-tags"><span class="tag niveau">'+(a.niveau||'gratuit')+'</span>'+gradeTag+(a.age?'<span class="tag age">'+a.age+'</span>':'')+discTag+'</div>'+
+        ((gradeTag||discTag)?'<div class="card-tags">'+gradeTag+discTag+'</div>':'')+
         '<div class="card-theme">'+a.titre+'</div>'+
         '<div class="vote-section">'+
         '<button class="vote-btn'+(isVoted?' voted':'')+'" onclick="vote(this,\''+id+'\',\''+a.prenom+'\','+a.score+')" data-id="'+id+'">'+svgHeart+(isVoted?' Vote':' Voter')+'</button>'+
-        '<span class="vote-count" id="votes-'+id+'">'+(a.votes||0)+' vote'+((a.votes||0)!==1?'s':'')+'</span>'+
+        '<span class="like-count'+((a.votes||0)>0?' has-likes':'')+'">'+svgHeart+'<b id="votes-'+id+'">'+(a.votes||0)+'</b></span>'+
         '<button class="share-btn" onclick="share(\''+a.prenom+'\','+a.challenge_id+')">Partager</button>'+
         '</div></div></article>';
     }).join('');
@@ -467,7 +471,7 @@
     var nv=action==='add'?cur+1:Math.max(0,cur-1);
     if(action==='add'){btn.classList.add('voted');btn.innerHTML=btn.innerHTML.replace('Voter','Vote');addVoted(id);}
     else{btn.classList.remove('voted');btn.innerHTML=btn.innerHTML.replace('Vote','Voter');removeVoted(id);}
-    countEl.textContent=nv+' vote'+(nv!==1?'s':'');
+    countEl.textContent=nv;countEl.parentNode.classList.toggle('has-likes',nv>0);
     var sv=document.getElementById('stat-votes');
     sv.textContent=action==='add'?(parseInt(sv.textContent)||0)+1:Math.max(0,(parseInt(sv.textContent)||0)-1);
     try{
@@ -483,7 +487,7 @@
   function rollback(opts,cur){
     if(opts.action==='add'){opts.btn.classList.remove('voted');opts.btn.innerHTML=opts.btn.innerHTML.replace('Vote','Voter');removeVoted(opts.id);}
     else{opts.btn.classList.add('voted');opts.btn.innerHTML=opts.btn.innerHTML.replace('Voter','Vote');addVoted(opts.id);}
-    opts.countEl.textContent=cur+' vote'+(cur!==1?'s':'');
+    opts.countEl.textContent=cur;opts.countEl.parentNode.classList.toggle('has-likes',cur>0);
   }
 
   function share(artist,day){
